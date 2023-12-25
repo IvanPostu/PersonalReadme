@@ -15,6 +15,12 @@ $ db.collection.find()  # Example query to find documents in a collection
 
 ```
 
+## Questions 
+
+1) What is unbounded document?
+    - Unbounded means that document grows infinetly due to poor designed embedding relationship to other collection of elements, like "Article and Multiple Comments which are stored inside the article"
+
+
 ## What is MongoDB
 It is a general purpose document database suitable for a wide range of use cases. 
 
@@ -47,6 +53,31 @@ It is a general purpose document database suitable for a wide range of use cases
 
 ## Polymorphic documents
 - Means that collection can store different sort of documents
+
+## Data Modeling
+Data Modeling - process of defining how data is stored and relationships that exist among different entities in data.\
+
+## Key principle of data modeling with MongoDB
+- Data that is accessed together should be stored together
+
+## Relationship types
+- One-To-One
+- One-To-Many
+- Many-To-Many
+
+## Ways to model relationships 
+- Embedding
+- Referencing
+<img src="./mongo2.png" alt="Image Description" >
+
+## Embedding data in document (Why is good?)
+- Improves reading performance
+- Improves edit operation because edit will affect only one document
+- Avoid unnecessary joins
+## Embedding data in document (Why is bad?)
+- Is possible to have unbounded documents
+- Unbounded documents may exceed the BSON document threshold of 16MBs
+
 
 ## Lab 1 
 - Create a DB and 2 collections, insert 2 records and update 1 through MongoDB-Atlas
