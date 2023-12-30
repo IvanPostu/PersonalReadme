@@ -183,14 +183,15 @@ Data Modeling - process of defining how data is stored and relationships that ex
 ## Questions & Answers
 
 1) What is unbounded document?
-    - **Answer:** Unbounded means that document grows infinitely due to poor designed embedding relationship to other collection of elements, like "Article and Multiple Comments" 
+   - **Answer:** Unbounded means that document grows infinitely due to poor designed embedding relationship to other collection of elements, like "Article and Multiple Comments" 
 2) How a valid connection string looks like? 
-    - **Answers:**
+   - **Answers:**
       - `mongodb+srv://MDBUser:university01@mdb-training-cluster.swnn5.mongodb.net?retryWrites=true&w=majority`
       - `mongodb://root:root@localhost:27017/admin`
 3) Which connection string is valid `"mongodb://test2:t%25e%29s%24t2@localhost:27017/my_db"` or `"mongodb://test2:t%e)s$t2@localhost:27017/my_db"` ?
-    - **Answer:** `"mongodb://test2:t%25e%29s%24t2@localhost:27017/my_db"` because it should be a valid urlencoded string.
-   
+   - **Answer:** `"mongodb://test2:t%25e%29s%24t2@localhost:27017/my_db"` because it should be a valid urlencoded string.
+4) How many instances of `MongoClient` is recommended be created in a program?
+   - **Answer:** Only one because it is expensive operation and it handles multiple connections inside the instance.
    
 
 ## Java
