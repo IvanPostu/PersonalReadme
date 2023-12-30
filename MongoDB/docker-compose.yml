@@ -11,4 +11,6 @@ services:
         environment:
             - MONGO_INITDB_ROOT_USERNAME=root
             - MONGO_INITDB_ROOT_PASSWORD=root
-        image: mongo
+        image: mongo:4.4.26
+        volumes:
+            - ./data:/data/db
