@@ -157,7 +157,7 @@ Is used this approach to have a key generator for distributed database.
 - Means that collection can store different sort of documents
 
 ## Data Modeling
-Data Modeling - process of defining how data is stored and relationships that exist among different entities in data.\
+Data Modeling - process of defining how data is stored and relationships that exist among different entities in data.
 
 ## Key principle of data modeling with MongoDB
 - Data that is accessed together should be stored together
@@ -170,7 +170,7 @@ Data Modeling - process of defining how data is stored and relationships that ex
 ## Ways to model relationships 
 - Embedding
 - Referencing
-<img src="./forReadme/mongo2.png" alt="Image Description" >
+- <img src="./forReadme/mongo2.png" alt="Image Description" height="300px" >
 
 ## Embedding data in document (Why is good?)
 - Improves reading performance
@@ -183,10 +183,15 @@ Data Modeling - process of defining how data is stored and relationships that ex
 ## Questions & Answers
 
 1) What is unbounded document?
-    - Unbounded means that document grows infinitely due to poor designed embedding relationship to other collection of elements, like "Article and Multiple Comments" 
-2) How a valid connection string looks like?
-    - `mongodb+srv://MDBUser:university01@mdb-training-cluster.swnn5.mongodb.net?retryWrites=true&w=majority`
-    - `mongodb://root:root@localhost:27017/admin`
+    - **Answer:** Unbounded means that document grows infinitely due to poor designed embedding relationship to other collection of elements, like "Article and Multiple Comments" 
+2) How a valid connection string looks like? 
+    - **Answers:**
+      - `mongodb+srv://MDBUser:university01@mdb-training-cluster.swnn5.mongodb.net?retryWrites=true&w=majority`
+      - `mongodb://root:root@localhost:27017/admin`
+3) Which connection string is valid `"mongodb://test2:t%25e%29s%24t2@localhost:27017/my_db"` or `"mongodb://test2:t%e)s$t2@localhost:27017/my_db"` ?
+    - **Answer:** `"mongodb://test2:t%25e%29s%24t2@localhost:27017/my_db"` because it should be a valid urlencoded string.
+   
+   
 
 ## Java
 
@@ -200,6 +205,8 @@ $ ./mvnw dependency:resolve
 
 # to run the program
 $ ./mvnw compile exec:java -Dexec.mainClass="ipostu.mongo.demo.App" -Dmongodb.uri="mongodb://root:root@localhost:27017/admin"
+
+$ ./mvnw compile exec:java -Dexec.mainClass="ipostu.mongo.demo.part1.Part1" -Dmongodb.uri="mongo://test2:t%25e%29s%24t2@localhost:27017/my_db"
 ```
 
 ### Get all databases
