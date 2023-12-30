@@ -18,6 +18,9 @@ $ mongosh --host 127.0.0.1 --port 27017 --username root --password root --authen
 
 $ mongo --host 127.0.0.1 --port 27017 -u root -p root --authenticationDatabase admin
 
+# connect through cli using connection string
+$ mongo 'mongodb://root:root@localhost:27017/admin'
+
 $ mongo --nodb
 > conn = new Mongo("127.0.0.1:27017")
 > db = conn.getDB("admin")
@@ -192,3 +195,6 @@ Data Modeling - process of defining how data is stored and relationships that ex
 ## Exercise 2 
 - Connect to local MongoDB using Compass GUI with connection string: `mongodb://root:root@localhost:27017/admin`
 <img src="./mongo3.png" alt="Image Description" >
+
+# References:
+- https://www.mongodb.com/docs/drivers/
