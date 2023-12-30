@@ -1,1 +1,39 @@
-/MongoDB/data
+_container_data
+
+
+# Maven specific
+target/
+*.iml
+.idea/
+
+# Compiled class file
+*.class
+
+# Log files
+*.log
+
+# Maven Wrapper
+.mvn/wrapper/maven-wrapper.jar
+.mvn/wrapper/maven-wrapper.properties
+
+# Eclipse specific
+.settings/
+.classpath
+.project
+
+# IntelliJ IDEA specific
+.idea/
+
+# NetBeans specific
+nb-configuration.xml
+
+# Mac OS specific
+.DS_Store
+
+# Windows specific
+Thumbs.db
+Desktop.ini
+
+# VS Code specific
+.vscode/
+

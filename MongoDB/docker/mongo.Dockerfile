@@ -5,6 +5,6 @@ ENV MONGO_INITDB_ROOT_PASSWORD=root
 
 WORKDIR /docker-entrypoint-initdb.d/
 
-COPY container-init-scripts/ .
+COPY ./container-init-scripts/ .
 
 CMD ["mongod"]

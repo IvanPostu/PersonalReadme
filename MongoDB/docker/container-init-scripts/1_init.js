@@ -8,10 +8,17 @@ db.mycollection.insert([
     { name: 'Document 3' }
 ]);
 
-// Create a user with read and write privileges for the database
 db.createUser({
     user: 'test1',
     pwd: 'test1',
+    roles: [
+        { role: 'readWrite', db: 'my_db' }
+    ]
+});
+
+db.createUser({
+    user: 'test2',
+    pwd: 't%e)s$t2',
     roles: [
         { role: 'readWrite', db: 'my_db' }
     ]

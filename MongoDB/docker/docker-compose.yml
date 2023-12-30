@@ -12,4 +12,4 @@ services:
             options:
                 max-size: 1g
         volumes:
-            - ./_data:/data/db
+            - ./_container_data:/data/db

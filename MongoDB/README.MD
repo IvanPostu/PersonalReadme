@@ -170,7 +170,7 @@ Data Modeling - process of defining how data is stored and relationships that ex
 ## Ways to model relationships 
 - Embedding
 - Referencing
-<img src="./mongo2.png" alt="Image Description" >
+<img src="./forReadme/mongo2.png" alt="Image Description" >
 
 ## Embedding data in document (Why is good?)
 - Improves reading performance
@@ -214,11 +214,11 @@ try (MongoClient mongoClient = MongoClients.create(connectionString)) {
 
 ## Exercise 1 
 - Create a DB and 2 collections, insert 2 records and update 1 through MongoDB-Atlas
-<img src="./mongo1.png" alt="Image Description" >
+<img src="./forReadme/mongo1.png" alt="Image Description" >
 
 ## Exercise 2 
 - Connect to local MongoDB using Compass GUI with connection string: `mongodb://root:root@localhost:27017/admin`
-<img src="./mongo3.png" alt="Image Description" >
+<img src="./forReadme/mongo3.png" alt="Image Description" >
 
 # References:
 - https://www.mongodb.com/docs/drivers/
