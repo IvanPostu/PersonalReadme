@@ -2,6 +2,9 @@
 
 ## Setup MongoDB Container
 ```bash
+# to install a mongo client in isolated shell
+$ nix-shell ./mongo-client.nix --run bash
+
 # to remove recursively shared data folder if needed
 $ docker-compose up -d
 $ docker-compose stop
@@ -9,7 +12,7 @@ $ docker-compose down
 $ docker exec -it ipostu-mongo bash
 ```
 
-## Connect through cli tool mongo
+## Connect through cli tool
 ```bash
 $ mongosh --host 127.0.0.1 --port 27017 --username root --password root --authenticationDatabase admin
 
