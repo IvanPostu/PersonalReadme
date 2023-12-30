@@ -101,12 +101,6 @@ To not execute .mongorc.js, should be used the flag `-norc`
 
 ```
 
-## Questions 
-
-1) What is unbounded document?
-    - Unbounded means that document grows infinitely due to poor designed embedding relationship to other collection of elements, like "Article and Multiple Comments" 
-
-
 ## What is MongoDB
 It is a general purpose document database suitable for a wide range of use cases. 
 
@@ -183,8 +177,18 @@ Data Modeling - process of defining how data is stored and relationships that ex
 - Is possible to have unbounded documents
 - Unbounded documents may exceed the BSON document threshold of 16MBs
 
+## Questions & Answers
 
-## Lab 1 
+1) What is unbounded document?
+    - Unbounded means that document grows infinitely due to poor designed embedding relationship to other collection of elements, like "Article and Multiple Comments" 
+2) How a valid connection string looks like?
+    - `mongodb+srv://MDBUser:university01@mdb-training-cluster.swnn5.mongodb.net?retryWrites=true&w=majority`
+    - `mongodb://root:root@localhost:27017/admin`
+
+## Exercise 1 
 - Create a DB and 2 collections, insert 2 records and update 1 through MongoDB-Atlas
 <img src="./mongo1.png" alt="Image Description" >
 
+## Exercise 2 
+- Connect to local MongoDB using Compass GUI with connection string: `mongodb://root:root@localhost:27017/admin`
+<img src="./mongo3.png" alt="Image Description" >
