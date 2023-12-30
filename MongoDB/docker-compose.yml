@@ -1,6 +1,9 @@
 version: '3.3'
 services:
     mongo:
+        build: 
+            context: .
+            dockerfile: mongo.Dockerfile
         ports:
             - '27017:27017'
         container_name: ipostu-mongo
@@ -8,9 +11,5 @@ services:
         logging:
             options:
                 max-size: 1g
-        environment:
-            - MONGO_INITDB_ROOT_USERNAME=root
-            - MONGO_INITDB_ROOT_PASSWORD=root
-        image: mongo:4.4.26
         volumes:
-            - ./data:/data/db
+            - ./_data:/data/db

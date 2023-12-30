@@ -6,7 +6,7 @@
 $ nix-shell ./mongo-client.nix --run bash
 
 # to remove recursively shared data folder if needed
-$ docker-compose up -d
+$ docker-compose up --build -d
 $ docker-compose stop
 $ docker-compose down
 $ docker exec -it ipostu-mongo bash
@@ -187,6 +187,30 @@ Data Modeling - process of defining how data is stored and relationships that ex
 2) How a valid connection string looks like?
     - `mongodb+srv://MDBUser:university01@mdb-training-cluster.swnn5.mongodb.net?retryWrites=true&w=majority`
     - `mongodb://root:root@localhost:27017/admin`
+
+## Java
+
+### Theory
+- `MongoClient` should be singleton because it encapsulates the logic of creating connection for each query.
+
+### How to run POC java project
+```sh
+# to resolve dependencies 
+$ ./mvnw dependency:resolve
+
+# to run the program
+$ ./mvnw compile exec:java -Dexec.mainClass="ipostu.mongo.demo.App" -Dmongodb.uri="mongodb://root:root@localhost:27017/admin"
+```
+
+### Get all databases
+```java
+String connectionString = System.getProperty("mongodb.uri");
+try (MongoClient mongoClient = MongoClients.create(connectionString)) {
+    List<Document> databases = mongoClient.listDatabases().into(new ArrayList<>());
+    databases.forEach(db -> System.out.println(db.toJson()));
+}
+```
+
 
 ## Exercise 1 
 - Create a DB and 2 collections, insert 2 records and update 1 through MongoDB-Atlas
