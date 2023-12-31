@@ -267,6 +267,58 @@ $ db.zips.aggregate([
 ])
 ```
 
+## Indexes
+
+```sh
+$ db.customers.createIndex({email:1}, {unique:true}) # create an unique index for email field with ASC order and unique constraint
+
+$ db.customers.getIndexes()
+
+$ db.customers.explain().fetch({...}) # explaint the query, the most important field is "winningPlan"
+
+$ db.customers.explain().find({
+  birthdate: {
+    $gt:ISODate("1995-08-01")
+    }
+  }).sort({
+    email:1
+    })
+
+# Create a Single field Multikey Index
+$ db.customers.createIndex({
+  accounts: 1
+})
+
+
+# example of a query and a good index for it 
+$ db.customers.find({
+  birthdate: {
+    $gte:ISODate("1977-01-01")
+    },
+    active:true
+    }).sort({
+      birthdate:-1, 
+      name:1
+      })
+$ db.customers.createIndex({
+  active:1, 
+  birthdate:-1,
+  name:1
+})
+
+# hide the index
+$ db.collection.hideIndex('index_name') # on write the index will be used, on read will be ignored
+
+# drop the index
+$ db.collection.dropIndex('index_name')
+
+# drop indexes
+$ db.collection.dropIndexes([
+  'index1name', 'index2name', 'index3name'
+  ])
+$ db.collection.dropIndexes()
+```
+
 ## What is MongoDB
 It is a general purpose document database suitable for a wide range of use cases. 
 
@@ -293,6 +345,15 @@ Keys constraints:
 - **Aggregation** - collection and summary of data
   - **Stage** - one of the built-in methods that can be completed on the data, but does not permanently alter it
   - **Aggregation pipeline** - a series of stages completed on the data in order
+- **Indexes** - data structures used to improve read performance but affects write performance
+  - **Single field index** - A single field index is an index on a single field of a document. MongoDB creates a single field index on the _id field by default, but additional indexes may be needed for other fields as well. A single field index can also be a multikey index if it operates on an array field.
+  - **Compound index** - A single index structure holds references to multiple fields within a collection's documents. A compound index is created by specifying the fields that the index should reference, followed by the order in which the fields should be sorted. The order of the fields in the index is important because it determines the order in which the documents are returned when querying the collection. A compound index can also be a multikey index if one of the fields is an array.
+  - **Multikey index** - A multikey index is an index on an array field. Each element in the array gets an index key, which supports efficient querying against array fields. Both single field and compound indexes can have an array field, so there are both multikey single field indexes and multikey compound indexes.
+- **Execution stages** - main elements of `explain()` plan are:
+   - `IXSCAN` stage indicates the query is using an index and what index is being selected.
+   - `COLLSCAN` stage indicates a collection scan is perform, not using any indexes.
+   - `FETCH` stage indicates documents are being read from the collection.
+   - `SORT` stage indicates documents are being sorted in memory.
 
 ## Data types
 - All JSON data types
@@ -382,6 +443,18 @@ Data Modeling - process of defining how data is stored and relationships that ex
    - **Answer:** Create a signle document for each distinct document
 16) What happens if you set the `$out` stage to output to a collection that already exists?
    - **Answer:** The existing collection is overwritten by the returning collection
+17) What is the main purpose of an index?
+   - **Answer:** For fast data retrieval
+18) In what operations the indexes are used?
+   - **Answer:** equality, range-based and sorting
+19) What is the negative part of using indexes?
+   - **Answer:** writing and updating cause degradation of performance due to restruction of the index 
+20) How many multikey indexes can have a compound index?
+   - **Answer:** the limit is only one multikey index per compound index
+21) Do the order of fields in compound index matters?
+   - **Answer:** Yes, the order of the fields matters when creating the index and the sort order. It is recommended to list the fields in the following order: Equality, Sort, and Range.
+
+
 ## Java
 
 ### Theory
