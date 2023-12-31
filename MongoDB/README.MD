@@ -104,6 +104,48 @@ To not execute .mongorc.js, should be used the flag `-norc`
 
 ```
 
+```sh
+# Create
+$ db.collection.insertOne({...})
+$ db.collection.insertMany([{...}, {...}])
+
+# Read
+$ db.collection.find({field: { $eq: value }}) # match by value
+$ db.collection.find({field: value}) # shorter form
+$ db.collection.find({field: { $in: [value1, value2 ...] }}) # check equality to one of ...
+
+$ db.collection.find({field: { $gt: value }}) # greater than
+$ db.collection.find({field: { $lt: value }}) # lesser than
+$ db.collection.find({field: { $gte: value }}) # greater than or equal
+$ db.collection.find({field: { $lte: value }}) # lesser than or equal
+# E.g.:
+$ db.sales.find({ "items.price": { $gt: 50}})
+$ db.sales.find({ "items.price": { $lt: 50}})
+$ db.sales.find({ "customer.age": { $lte: 65}})
+$ db.sales.find({ "customer.age": { $gte: 65}})
+
+$ db.collection.find({field: { $elemMatch: { $eq: "abc" } }}) # is applied to sub-collection if it is not collection then the record is ignored
+$ db.sales.find({
+  items: {
+    $elemMatch: { name: "laptop", price: { $gt: 800 }, quantity: { $gte: 1 } },
+  },
+}) # other example...
+
+$ db.collection.find({field: { $and: {...} }}) # AND
+$ db.collection.find({field: { <condition1>, <condition2>, ... }}) # Also AND
+$ db.collection.find({field: { $or: {...} }}) # OR
+# E.g.
+$ db.collection.find({field: { "sector": "Mobile Food Vendor - 881" , "address.city": "ASTORIA" , "result": "Pass"}})
+$ db.routes.find({
+  $and: [
+    { $or: [{ dst_airport: "London" }, { src_airport: "London" }] },
+    { $or: [{ stops: 0 }, { airline.name: "British Airlines"}] },
+  ]
+})
+
+```
+
+
 ## What is MongoDB
 It is a general purpose document database suitable for a wide range of use cases. 
 
@@ -185,14 +227,27 @@ Data Modeling - process of defining how data is stored and relationships that ex
 1) What is unbounded document?
    - **Answer:** Unbounded means that document grows infinitely due to poor designed embedding relationship to other collection of elements, like "Article and Multiple Comments" 
 2) How a valid connection string looks like? 
-   - **Answers:**
+   - **Answer:**
       - `mongodb+srv://MDBUser:university01@mdb-training-cluster.swnn5.mongodb.net?retryWrites=true&w=majority`
       - `mongodb://root:root@localhost:27017/admin`
 3) Which connection string is valid `"mongodb://test2:t%25e%29s%24t2@localhost:27017/my_db"` or `"mongodb://test2:t%e)s$t2@localhost:27017/my_db"` ?
    - **Answer:** `"mongodb://test2:t%25e%29s%24t2@localhost:27017/my_db"` because it should be a valid urlencoded string.
 4) How many instances of `MongoClient` is recommended be created in a program?
    - **Answer:** Only one because it is expensive operation and it handles multiple connections inside the instance.
-   
+5) How to insert one element in a collection?
+   - **Answer:** to call `db.<collectionName>.insertOne({<document>})`
+6) How to insert multiple elements in a collection?
+   - **Answer:** to call `db.<collectionName>.insertMany([{<document>}, {<document>}])`
+7) What happens is I call `insertOne` or `insertMany` for nonexisting element?
+   - **Answer:** the collection is created automatically
+8) What methods allow to extract data from collection?
+   - **Answer:** `db.collection.find(...)`
+9) If I have next collection: `[{a: 22}, {a: [33, 22]}]` what will return `db.collection.find({a: { $eq: 22 }})`
+   - **Answer:** `[{a: 22}, {a: [33, 22]}]`
+10) If I have next collection: `[{a: 22}, {a: [33, 22]}]` what will return `db.collection.find({a: { $elemMatch: { $eq: 22 } }})`
+   - **Answer:** `[{a: [33, 22]}]`
+11) What is the problem with this query: `db.collection.find({$or: {...}, $or: {...}})` DON'T DO IN THAT WAY!!!
+   - **Answer:** The second `$or` operator will override the first one
 
 ## Java
 
