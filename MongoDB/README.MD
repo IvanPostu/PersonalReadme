@@ -182,6 +182,91 @@ $ db.collections.countDocuments(<query>, <optiona>)
 $ db.trips.countDocuments({ tripduration: { $gt: 120 }, usertype: "Subscriber" })
 ```
 
+### Aggregation pipeline & staging
+```sh
+$ db.collection.aggregate([
+    {
+        $stage1: {
+            { expression1 },
+            { expression2 }...
+        },
+        $stage2: {
+            { expression1 }...
+        }
+    }
+])
+
+$ db.zips.aggregate([
+{   
+   $match: { 
+      state: "CA"
+    }
+},
+{
+   $group: {
+      _id: "$city",
+      totalZips: { $count : { } }
+   }
+}
+])
+
+# Sorts the documents in descending order, the documents with the greatest pop value appear first, and limits the output to only the first five documents after sorting
+$ db.zips.aggregate([
+{
+  $sort: {
+    pop: -1
+  }
+},
+{
+  $limit:  5
+}
+])
+
+$ db.zips.aggregate([
+{
+   $project: {
+      state:1, 
+      zip:1,
+      population:"$pop",
+      _id:0
+   }
+}
+])
+
+$ db.zips.aggregate([
+{
+   $set: {
+      place: {
+         $concat:["$city",",","$state"]
+      },
+      pop:10000
+   }
+}
+])
+
+$ db.zips.aggregate([
+{
+   $count: "total_zips"
+}
+])
+
+# $out is used to keep the result in a new collection
+# if collection exists then it is overwritten
+$ db.zips.aggregate([
+{
+  $sort: {
+    pop: -1
+  }
+},
+{
+  $limit:  5
+},
+{
+   $out: 'temp_collection'
+}
+])
+```
+
 ## What is MongoDB
 It is a general purpose document database suitable for a wide range of use cases. 
 
@@ -205,6 +290,9 @@ Keys constraints:
 - **Collection** - a set of documents
 - **Database** - container for collections
 - **BSON** - format in which the documents are stored (binary json)
+- **Aggregation** - collection and summary of data
+  - **Stage** - one of the built-in methods that can be completed on the data, but does not permanently alter it
+  - **Aggregation pipeline** - a series of stages completed on the data in order
 
 ## Data types
 - All JSON data types
@@ -288,7 +376,12 @@ Data Modeling - process of defining how data is stored and relationships that ex
    - **Answer:** Sorted alphabetically A...Za...z
 13) Projection: Are inclusion and exclusion allowed together?
    - **Answer:** No, the only one exception is inclusion with explicit exclusion of `_id` attribute
-
+14) What does `$match` aggregation stage does?
+   - **Answer:** Filter for documents matching criteria
+15) What does `$group` aggregation stage does?
+   - **Answer:** Create a signle document for each distinct document
+16) What happens if you set the `$out` stage to output to a collection that already exists?
+   - **Answer:** The existing collection is overwritten by the returning collection
 ## Java
 
 ### Theory
