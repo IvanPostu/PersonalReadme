@@ -145,6 +145,42 @@ $ db.routes.find({
 
 ```
 
+### Sort & Limit
+
+```sh
+$ db.collection.find().sort()
+$ db.collection.find().limit()
+$ db.collection.find({name: 'test'}).sort({name: 1}) # name 1 means sort ASC
+
+$ db.companies.find({category_code: 'music'}, {name: 1, number_of_employees: 1}).sort({number_of_employees: 1}).limit(3)
+
+# Return data on all music companies, sorted alphabetically from A to Z. Ensure consistent sort order
+$ db.companies.find({ category_code: "music" }).sort({ name: 1, _id: 1 });
+
+# Return the three music companies with the highest number of employees. Ensure consistent sort order.
+$ db.companies
+  .find({ category_code: "music" })
+  .sort({ number_of_employees: -1, _id: 1 })
+  .limit(3);
+```
+### Projection
+```sh
+$ db.inspections.find({sector: {$eq: 'test'}}, {business_name: 1, result: 1, _id: 0}) # inclusion method with exclusion for `_id`
+
+# Return all inspections with result of "Pass" or "Warning" - exclude date and zip code
+$ db.inspections.find(
+  { result: { $in: ["Pass", "Warning"] } },
+  { date: 0, "address.zip": 0 }
+)
+```
+
+### Count documents
+```sh
+$ db.collections.countDocuments(<query>, <optiona>)
+
+# Count number of trips over 120 minutes by subscribers
+$ db.trips.countDocuments({ tripduration: { $gt: 120 }, usertype: "Subscriber" })
+```
 
 ## What is MongoDB
 It is a general purpose document database suitable for a wide range of use cases. 
@@ -238,7 +274,7 @@ Data Modeling - process of defining how data is stored and relationships that ex
    - **Answer:** to call `db.<collectionName>.insertOne({<document>})`
 6) How to insert multiple elements in a collection?
    - **Answer:** to call `db.<collectionName>.insertMany([{<document>}, {<document>}])`
-7) What happens is I call `insertOne` or `insertMany` for nonexisting element?
+7) What happens if I call `insertOne` or `insertMany` for nonexisting element?
    - **Answer:** the collection is created automatically
 8) What methods allow to extract data from collection?
    - **Answer:** `db.collection.find(...)`
@@ -248,6 +284,10 @@ Data Modeling - process of defining how data is stored and relationships that ex
    - **Answer:** `[{a: [33, 22]}]`
 11) What is the problem with this query: `db.collection.find({$or: {...}, $or: {...}})` DON'T DO IN THAT WAY!!!
    - **Answer:** The second `$or` operator will override the first one
+12) How does strings are sorted in MongoDB by default for instance for `.sort(name: 1)`
+   - **Answer:** Sorted alphabetically A...Za...z
+13) Projection: Are inclusion and exclusion allowed together?
+   - **Answer:** No, the only one exception is inclusion with explicit exclusion of `_id` attribute
 
 ## Java
 
