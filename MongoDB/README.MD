@@ -143,6 +143,47 @@ $ db.routes.find({
   ]
 })
 
+# Update
+$ db.collection.replaceOne(filter, replacement, options);
+# E.g.: 
+$ db.books.replaceOne(
+  {
+    _id: ObjectId("1112afeb441a74a98dbbec4e"),
+  },
+  {
+    title: "Book Name 1"
+  }
+)
+
+$ db.collection.updateOne(filter, update, options);
+# update parameter can be: {...}
+#  $set adds a new field or replace existing one
+#  $push appends a value to an array or creates an array with one element
+# options parameter can be: {...}
+# $upsert: true|false which if is true creates a new document if it doesn't exists
+
+# updateOne + findOne
+$ db.collection.findAndModify({query:{...}, update:{...}, new:true|false});
+# E.g. query and update fields are required
+$ db.channels.findAndModify({
+  query: { _id: ObjectId("1111a92dfee1ff300dc80bf1") },
+  update: { $inc: { subscribers: 1 } },
+  new: true,
+  upsert: true
+})
+# new flag indicates that the document should be returned even if it is new or created
+# upsert = insert or update
+
+$ db.collection.updateMany(filter, update, options);
+$ db.articles.updateMany(
+  { publishedDate: { $lt: new Date("2019-02-22") } },
+  { $set: { status: "LEGACY" } }
+)
+
+# Delete
+$ db.collection.deleteOne(filter, options);
+$ db.collection.deleteMany(filter, options);
+
 ```
 
 
