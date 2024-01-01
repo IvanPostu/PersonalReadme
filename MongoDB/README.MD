@@ -519,6 +519,8 @@ Data Modeling - process of defining how data is stored and relationships that ex
    - **Answer:** No, to achieve that, should be used a transaction 
 24) Multi-document transaction guarantees that operations have ACID?
    - **Answer:** Yes
+24) In which way Spring Data helps to interact with MongoDB?
+   - **Answer:** It helps with mapping documents to java pojos
 
 ## Java
 
@@ -664,6 +666,149 @@ try {
     clientSession.close();
 }
 ```
+
+## Spring Boot & Spring Data 
+```sh
+<dependency>	
+    <groupId>org.springframework.data</groupId>	
+    <artifactId>spring-boot-starter-data-mongodb</artifactId>	
+    <version>2.7.11</version>	
+</dependency>
+
+or
+
+implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+```
+
+```java
+// Configuration bean
+// Option 1
+@Configuration
+public class MongoConfig extends AbstractMongoClientConfiguration {
+ 
+    @Override
+    protected String getDatabaseName() {
+        return "test";
+    }
+ 
+    @Override
+    public MongoClient mongoClient() {
+        ConnectionString connectionString = new ConnectionString("mongodb://localhost:27017/test");
+        MongoClientSettings mongoClientSettings = MongoClientSettings.builder()
+            .applyConnectionString(connectionString)
+            .build();
+        
+        return MongoClients.create(mongoClientSettings);
+    }
+ 
+    @Override
+    public Collection getMappingBasePackages() {
+        return Collections.singleton("com.baeldung");
+    }
+}
+
+// Option 2
+@Configuration
+public class MongoConfiguration {
+    @Bean
+    public MongoClient mongo() {
+        ConnectionString connectionString = new ConnectionString("mongodb://test2:t%25e%29s%24t2@localhost:27017/my_db");
+        MongoClientSettings mongoClientSettings = MongoClientSettings.builder()
+                .applyConnectionString(connectionString)
+                .build();
+
+        return MongoClients.create(mongoClientSettings);
+    }
+
+    @Bean
+    public MongoTemplate mongoTemplate() throws Exception {
+        return new MongoTemplate(mongo(), "my_db");
+    }
+}
+```
+
+```java
+// Model class
+@Document("tvItem")
+public class TVItem {
+
+    @Id
+    private String id;
+
+    private String name;
+
+    private int quantity;
+
+    private String category;
+
+    public TVItem(String id, String name, int quantity, String category) {
+        this.id = id;
+        this.name = name;
+        this.quantity = quantity;
+        this.category = category;
+    }
+
+    // getters and setters
+}
+```
+
+```java
+// Repository entity
+public interface TVItemRepository extends MongoRepository<TVItem, String> {
+
+    @Query("{name: '?0'}")
+    TVItem findItemByName(String name);
+
+    @Query(value = "{category: '?0'}", fields = "{'name': 1, 'quantity': 1}")
+    List<TVItem> findAll(String category);
+
+    long count();
+}
+```
+
+```java
+// Example of usage:
+@EnableMongoRepositories("ipostu.mongo.demo.repository")
+@SpringBootApplication
+public class MongoDemoApplication implements CommandLineRunner {
+
+    @Autowired
+    private TVItemRepository tvItemRepository;
+
+    public static void main(String[] args) {
+        SpringApplication.run(MongoDemoApplication.class, args);
+    }
+
+    @Override
+    public void run(String... args) throws Exception {
+        Random random = new Random();
+
+        tvItemRepository.deleteAll();
+        String name1 = "test1" + random.nextInt(20);
+
+        //create
+        tvItemRepository.insert(new TVItem(null, name1, 21, "category1"));
+        tvItemRepository.insert(new TVItem(null, "test2" + random.nextInt(20), 22, "category1"));
+        tvItemRepository.insert(new TVItem(null, "test3" + random.nextInt(20), 23, "category2"));
+        tvItemRepository.insert(new TVItem(null, "test4" + random.nextInt(20), 24, "category2"));
+
+        var elements = tvItemRepository.findAll();
+
+        //2
+        var elementsForCategory2 = tvItemRepository.findAll("category2");
+        //2
+        var elementsForCategory1 = tvItemRepository.findAll("category1");
+
+        var test1Element = tvItemRepository.findItemByName(name1);
+        test1Element.setName("abc1");
+        tvItemRepository.save(test1Element);
+
+        long count = tvItemRepository.count();
+        elementsForCategory1 = tvItemRepository.findAll("category1");
+    }
+}
+```
+
 
 ## Exercise 1 
 - Create a DB and 2 collections, insert 2 records and update 1 through MongoDB-Atlas

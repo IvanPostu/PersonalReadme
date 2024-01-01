@@ -10,7 +10,6 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 
 @Configuration
 public class MongoConfiguration {
-
     @Bean
     public MongoClient mongo() {
         ConnectionString connectionString = new ConnectionString("mongodb://test2:t%25e%29s%24t2@localhost:27017/my_db");

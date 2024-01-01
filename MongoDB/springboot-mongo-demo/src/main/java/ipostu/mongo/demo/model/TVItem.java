@@ -3,7 +3,7 @@ package ipostu.mongo.demo.model;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document
+@Document("tvItem")
 public class TVItem {
 
     @Id
