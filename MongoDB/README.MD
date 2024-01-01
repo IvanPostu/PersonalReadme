@@ -362,6 +362,18 @@ $ db.collection.dropIndexes([
 $ db.collection.dropIndexes()
 ```
 
+### Transactions
+```sh
+$ const session = db.getMongo().startSession()
+
+$ session.startTransaction()
+
+$ const account = session.getDatabase('< add database name here>').getCollection('<add collection name here>')
+
+# Add database operations like .updateOne() here
+$ session.commitTransaction() # or session.abortTransaction()
+```
+
 ## What is MongoDB
 It is a general purpose document database suitable for a wide range of use cases. 
 
@@ -397,6 +409,11 @@ Keys constraints:
    - `COLLSCAN` stage indicates a collection scan is perform, not using any indexes.
    - `FETCH` stage indicates documents are being read from the collection.
    - `SORT` stage indicates documents are being sorted in memory.
+- **ACID** - represents:
+  - `Atomicity` - all operations will either succeed of fail together.
+  - `Consistency` - all changes are consistent with database constraints
+  - `Isolation` - multiple transactions can happen in the same time without affecting each other
+  - `Durability` - all changes made by a transaction are persisted and will be present after failure and recovery process (guarantee that the data is saved in non-volatile memory)
 
 ## Data types
 - All JSON data types
@@ -498,6 +515,10 @@ Data Modeling - process of defining how data is stored and relationships that ex
    - **Answer:** Yes, the order of the fields matters when creating the index and the sort order. It is recommended to list the fields in the following order: Equality, Sort, and Range.
 22) What will happen if a transaction runs more than 60 seconds?
    - **Answer:** It will be canceled due to mongodb limit of transaction time (60 seconds).
+23) Are database operations that affect more than one document, like ``.updateMany()` atomic?
+   - **Answer:** No, to achieve that, should be used a transaction 
+24) Multi-document transaction guarantees that operations have ACID?
+   - **Answer:** Yes
 
 ## Java
 
