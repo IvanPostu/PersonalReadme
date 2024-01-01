@@ -8,7 +8,9 @@ $ nix-shell ./mongo-client.nix --run bash
 # to remove recursively shared data folder if needed
 $ docker-compose up --build -d
 $ docker-compose stop
-$ docker-compose down
+
+#cleanup 
+$ docker-compose down && sudo rm -rf ./_container_data && docker image prune -a
 $ docker exec -it ipostu-mongo bash
 ```
 
@@ -506,10 +508,8 @@ Data Modeling - process of defining how data is stored and relationships that ex
 # to resolve dependencies 
 $ ./mvnw dependency:resolve
 
-# to run the program
-$ ./mvnw compile exec:java -Dexec.mainClass="ipostu.mongo.demo.App" -Dmongodb.uri="mongodb://root:root@localhost:27017/admin"
-
-$ ./mvnw compile exec:java -Dexec.mainClass="ipostu.mongo.demo.part1.Part1" -Dmongodb.uri="mongo://test2:t%25e%29s%24t2@localhost:27017/my_db"
+# run java program
+$ ./mvnw compile exec:java -Dexec.mainClass="ipostu.mongo.demo.part2.App" -Dmongodb.uri="mongodb://test2:t%25e%29s%24t2@localhost:27017/my_db"
 ```
 
 ### Get all databases
@@ -521,6 +521,44 @@ try (MongoClient mongoClient = MongoClients.create(connectionString)) {
 }
 ```
 
+### Insert one document
+```java
+String connectionString = System.getProperty("mongodb.uri");
+MongoClient mongoClient = MongoClients.create(connectionString);
+
+MongoDatabase database = mongoClient.getDatabase("my_db");
+MongoCollection<Document> collection = database.getCollection("mycollection");
+
+Document document = new Document("_id", new ObjectId())
+         .append("str", "abc 123 aaa")
+         .append("date", new Date());
+
+InsertOneResult inserted = collection.insertOne(document);
+BsonValue id = inserted.getInsertedId();
+System.out.println("Inserted with success: " + id);
+mongoClient.close();
+```
+
+### Insert many documents
+```java
+String connectionString = System.getProperty("mongodb.uri");
+MongoClient mongoClient = MongoClients.create(connectionString);
+
+MongoDatabase database = mongoClient.getDatabase("my_db");
+MongoCollection<Document> collection = database.getCollection("mycollection");
+
+Document document1 = new Document("_id", new ObjectId())
+         .append("str", "abc 123 aaa")
+         .append("date", new Date());
+Document document2 = new Document("_id", new ObjectId())
+         .append("str", "abc 123 aaa")
+         .append("date", new Date());
+List<Document> documents = List.of(document1, document2);
+
+InsertManyResult insertManyResult = collection.insertMany(documents);
+Map<Integer, BsonValue> insertedDocuments = insertManyResult.getInsertedIds();
+// {0=BsonObjectId{value=6592e45c5929350e92b905d2}, 1=BsonObjectId{value=6592e45c5929350e92b905d3}}
+```
 
 ## Exercise 1 
 - Create a DB and 2 collections, insert 2 records and update 1 through MongoDB-Atlas

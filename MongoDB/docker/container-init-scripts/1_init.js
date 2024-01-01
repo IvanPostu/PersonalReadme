@@ -1,11 +1,20 @@
 // Create a new database and switch to it
 db = db.getSiblingDB('my_db');
 
-// Create a new collection and insert documents
-db.mycollection.insert([
+// Create a new collection and insertMany documents
+db.mycollection.insertMany([
     { name: 'Document 1' },
     { name: 'Document 2' },
     { name: 'Document 3' }
+]);
+
+db.accounts.insertMany([
+    { account_type: 'type1', balance: 2000 },
+    { account_type: 'type1', balance: 1000 },
+    { account_type: 'checking', balance: 500 },
+    { account_type: 'checking', balance: 2000 },
+    { account_type: 'checking', balance: 3000 },
+    { account_type: 'checking', balance: 100 }
 ]);
 
 db.createUser({
