@@ -496,7 +496,8 @@ Data Modeling - process of defining how data is stored and relationships that ex
    - **Answer:** the limit is only one multikey index per compound index
 21) Do the order of fields in compound index matters?
    - **Answer:** Yes, the order of the fields matters when creating the index and the sort order. It is recommended to list the fields in the following order: Equality, Sort, and Range.
-
+22) What will happen if a transaction runs more than 60 seconds?
+   - **Answer:** It will be canceled due to mongodb limit of transaction time (60 seconds).
 
 ## Java
 
@@ -599,7 +600,48 @@ MongoCollection<Document> collection = database.getCollection("accounts");
 Bson query = Filters.eq("account_id", "MDB12234728");
 Bson updates = Updates.combine(Updates.set("account_status", "active"), Updates.inc("balance", 100));
 UpdateResult upResult = collection.updateOne(query, updates);
+```
 
+```java
+//delete one 
+MongoCollection<Document> collection = database.getCollection("accounts");
+Bson query = Filters.eq("account_holder", "john doe");
+DeleteResult delResult = collection.deleteOne(query);
+
+//delete many
+MongoCollection<Document> collection = database.getCollection("accounts");
+Bson query = eq("account_status", "dormant");
+DeleteResult delResult = collection.deleteMany(query);
+```
+
+```java
+final MongoClient client = MongoClients.create(connectionString);
+final ClientSession clientSession = client.startSession();
+
+TransactionBody txnBody = new TransactionBody<String>(){
+    public String execute() {
+        MongoCollection<Document> bankingCollection = client.getDatabase("bank").getCollection("accounts");
+
+        Bson fromAccount = eq("account_id", "MDB310054629");
+        Bson withdrawal = Updates.inc("balance", -200);
+
+        Bson toAccount = eq("account_id", "MDB643731035");
+        Bson deposit = Updates.inc("balance", 200);
+
+        bankingCollection.updateOne(clientSession, fromAccount, withdrawal);
+        bankingCollection.updateOne(clientSession, toAccount, deposit);
+
+        return "Transferred funds from John Doe to Mary Doe";
+    }
+};
+
+try {
+    clientSession.withTransaction(txnBody);
+} catch (RuntimeException e){
+    System.out.println(e);
+}finally{
+    clientSession.close();
+}
 ```
 
 ## Exercise 1 
