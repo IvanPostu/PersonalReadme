@@ -1,5 +1,4 @@
-package ipostu.mongo.demo;
-
+package ipostu.mongo.demo.part1;
 
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
@@ -11,9 +10,9 @@ import java.util.List;
 public class App {
     public static void main(String[] args) {
         String connectionString = System.getProperty("mongodb.uri");
-        try (MongoClient mongoClient = MongoClients.create(connectionString)) {
-            List<Document> databases = mongoClient.listDatabases().into(new LinkedList<>());
-            databases.forEach(db -> System.out.println(db.toJson()));
-        }
+        MongoClient mongoClient = MongoClients.create(connectionString);
+        List<Document> databases = mongoClient.listDatabases().into(new LinkedList<>());
+        databases.forEach(db -> System.out.println(db.toJson()));
+        mongoClient.close();
     }
 }
