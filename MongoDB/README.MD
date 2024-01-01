@@ -186,6 +186,179 @@ $ db.collection.deleteMany(filter, options);
 
 ```
 
+### Sort & Limit
+
+```sh
+$ db.collection.find().sort()
+$ db.collection.find().limit()
+$ db.collection.find({name: 'test'}).sort({name: 1}) # name 1 means sort ASC
+
+$ db.companies.find({category_code: 'music'}, {name: 1, number_of_employees: 1}).sort({number_of_employees: 1}).limit(3)
+
+# Return data on all music companies, sorted alphabetically from A to Z. Ensure consistent sort order
+$ db.companies.find({ category_code: "music" }).sort({ name: 1, _id: 1 });
+
+# Return the three music companies with the highest number of employees. Ensure consistent sort order.
+$ db.companies
+  .find({ category_code: "music" })
+  .sort({ number_of_employees: -1, _id: 1 })
+  .limit(3);
+```
+### Projection
+```sh
+$ db.inspections.find({sector: {$eq: 'test'}}, {business_name: 1, result: 1, _id: 0}) # inclusion method with exclusion for `_id`
+
+# Return all inspections with result of "Pass" or "Warning" - exclude date and zip code
+$ db.inspections.find(
+  { result: { $in: ["Pass", "Warning"] } },
+  { date: 0, "address.zip": 0 }
+)
+```
+
+### Count documents
+```sh
+$ db.collections.countDocuments(<query>, <optiona>)
+
+# Count number of trips over 120 minutes by subscribers
+$ db.trips.countDocuments({ tripduration: { $gt: 120 }, usertype: "Subscriber" })
+```
+
+### Aggregation pipeline & staging
+```sh
+$ db.collection.aggregate([
+    {
+        $stage1: {
+            { expression1 },
+            { expression2 }...
+        },
+        $stage2: {
+            { expression1 }...
+        }
+    }
+])
+
+$ db.zips.aggregate([
+{   
+   $match: { 
+      state: "CA"
+    }
+},
+{
+   $group: {
+      _id: "$city",
+      totalZips: { $count : { } }
+   }
+}
+])
+
+# Sorts the documents in descending order, the documents with the greatest pop value appear first, and limits the output to only the first five documents after sorting
+$ db.zips.aggregate([
+{
+  $sort: {
+    pop: -1
+  }
+},
+{
+  $limit:  5
+}
+])
+
+$ db.zips.aggregate([
+{
+   $project: {
+      state:1, 
+      zip:1,
+      population:"$pop",
+      _id:0
+   }
+}
+])
+
+$ db.zips.aggregate([
+{
+   $set: {
+      place: {
+         $concat:["$city",",","$state"]
+      },
+      pop:10000
+   }
+}
+])
+
+$ db.zips.aggregate([
+{
+   $count: "total_zips"
+}
+])
+
+# $out is used to keep the result in a new collection
+# if collection exists then it is overwritten
+$ db.zips.aggregate([
+{
+  $sort: {
+    pop: -1
+  }
+},
+{
+  $limit:  5
+},
+{
+   $out: 'temp_collection'
+}
+])
+```
+
+## Indexes
+
+```sh
+$ db.customers.createIndex({email:1}, {unique:true}) # create an unique index for email field with ASC order and unique constraint
+
+$ db.customers.getIndexes()
+
+$ db.customers.explain().fetch({...}) # explaint the query, the most important field is "winningPlan"
+
+$ db.customers.explain().find({
+  birthdate: {
+    $gt:ISODate("1995-08-01")
+    }
+  }).sort({
+    email:1
+    })
+
+# Create a Single field Multikey Index
+$ db.customers.createIndex({
+  accounts: 1
+})
+
+
+# example of a query and a good index for it 
+$ db.customers.find({
+  birthdate: {
+    $gte:ISODate("1977-01-01")
+    },
+    active:true
+    }).sort({
+      birthdate:-1, 
+      name:1
+      })
+$ db.customers.createIndex({
+  active:1, 
+  birthdate:-1,
+  name:1
+})
+
+# hide the index
+$ db.collection.hideIndex('index_name') # on write the index will be used, on read will be ignored
+
+# drop the index
+$ db.collection.dropIndex('index_name')
+
+# drop indexes
+$ db.collection.dropIndexes([
+  'index1name', 'index2name', 'index3name'
+  ])
+$ db.collection.dropIndexes()
+```
 
 ## What is MongoDB
 It is a general purpose document database suitable for a wide range of use cases. 
@@ -210,6 +383,18 @@ Keys constraints:
 - **Collection** - a set of documents
 - **Database** - container for collections
 - **BSON** - format in which the documents are stored (binary json)
+- **Aggregation** - collection and summary of data
+  - **Stage** - one of the built-in methods that can be completed on the data, but does not permanently alter it
+  - **Aggregation pipeline** - a series of stages completed on the data in order
+- **Indexes** - data structures used to improve read performance but affects write performance
+  - **Single field index** - A single field index is an index on a single field of a document. MongoDB creates a single field index on the _id field by default, but additional indexes may be needed for other fields as well. A single field index can also be a multikey index if it operates on an array field.
+  - **Compound index** - A single index structure holds references to multiple fields within a collection's documents. A compound index is created by specifying the fields that the index should reference, followed by the order in which the fields should be sorted. The order of the fields in the index is important because it determines the order in which the documents are returned when querying the collection. A compound index can also be a multikey index if one of the fields is an array.
+  - **Multikey index** - A multikey index is an index on an array field. Each element in the array gets an index key, which supports efficient querying against array fields. Both single field and compound indexes can have an array field, so there are both multikey single field indexes and multikey compound indexes.
+- **Execution stages** - main elements of `explain()` plan are:
+   - `IXSCAN` stage indicates the query is using an index and what index is being selected.
+   - `COLLSCAN` stage indicates a collection scan is perform, not using any indexes.
+   - `FETCH` stage indicates documents are being read from the collection.
+   - `SORT` stage indicates documents are being sorted in memory.
 
 ## Data types
 - All JSON data types
@@ -279,7 +464,7 @@ Data Modeling - process of defining how data is stored and relationships that ex
    - **Answer:** to call `db.<collectionName>.insertOne({<document>})`
 6) How to insert multiple elements in a collection?
    - **Answer:** to call `db.<collectionName>.insertMany([{<document>}, {<document>}])`
-7) What happens is I call `insertOne` or `insertMany` for nonexisting element?
+7) What happens if I call `insertOne` or `insertMany` for nonexisting element?
    - **Answer:** the collection is created automatically
 8) What methods allow to extract data from collection?
    - **Answer:** `db.collection.find(...)`
@@ -289,6 +474,27 @@ Data Modeling - process of defining how data is stored and relationships that ex
    - **Answer:** `[{a: [33, 22]}]`
 11) What is the problem with this query: `db.collection.find({$or: {...}, $or: {...}})` DON'T DO IN THAT WAY!!!
    - **Answer:** The second `$or` operator will override the first one
+12) How does strings are sorted in MongoDB by default for instance for `.sort(name: 1)`
+   - **Answer:** Sorted alphabetically A...Za...z
+13) Projection: Are inclusion and exclusion allowed together?
+   - **Answer:** No, the only one exception is inclusion with explicit exclusion of `_id` attribute
+14) What does `$match` aggregation stage does?
+   - **Answer:** Filter for documents matching criteria
+15) What does `$group` aggregation stage does?
+   - **Answer:** Create a signle document for each distinct document
+16) What happens if you set the `$out` stage to output to a collection that already exists?
+   - **Answer:** The existing collection is overwritten by the returning collection
+17) What is the main purpose of an index?
+   - **Answer:** For fast data retrieval
+18) In what operations the indexes are used?
+   - **Answer:** equality, range-based and sorting
+19) What is the negative part of using indexes?
+   - **Answer:** writing and updating cause degradation of performance due to restruction of the index 
+20) How many multikey indexes can have a compound index?
+   - **Answer:** the limit is only one multikey index per compound index
+21) Do the order of fields in compound index matters?
+   - **Answer:** Yes, the order of the fields matters when creating the index and the sort order. It is recommended to list the fields in the following order: Equality, Sort, and Range.
+
 
 ## Java
 
