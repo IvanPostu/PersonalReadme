@@ -162,7 +162,7 @@ $ db.collection.updateOne(filter, update, options);
 #  $set adds a new field or replace existing one
 #  $push appends a value to an array or creates an array with one element
 # options parameter can be: {...}
-# $upsert: true|false which if is true creates a new document if it doesn't exists
+# upsert: true|false which if is true creates a new document if it doesn't exists
 
 # updateOne + findOne
 $ db.collection.findAndModify({query:{...}, update:{...}, new:true|false});
@@ -521,6 +521,28 @@ Data Modeling - process of defining how data is stored and relationships that ex
    - **Answer:** Yes
 24) In which way Spring Data helps to interact with MongoDB?
    - **Answer:** It helps with mapping documents to java pojos
+25) Enumerate all BSON numeric types:
+   - **Answer:** 
+     - Double
+     - Int32
+     - Int64
+     - Decimal128
+26) What method should be used to get all documents from a cursor using mongosh?
+   - **Answer:** `db.collection.find().toArray();`
+27) How should the 'autocomplete' index be defined to look for matches at the beginning of a word on the `name` field?
+   - **Answer:** `{  "mappings": {    "dynamic": false,    "fields": {         "name": [   {  "type": "autocomplete",                              "tokenization": "edgeGram"} ]    } }}`
+28) How the query for Atlas search index should look like?
+   - **Answer:** `db.restaurants.aggregate([{    "$search": {      "text": { "path": "name", "query": "cuban"}    } }])`
+29) How a valid query for reading from one source to other looks like?
+   - **Answer:** `db.getSiblingDB("my_db").test99.aggregate([{ $out: {db:'my_db', coll:'test98'}} ])`
+30) For the query `db.people.find({employer : "ABC" }).sort ({last_name:1 , job:1})` which index is most optimal?
+   - **Answer:** 
+     - `db.people.createIndex({employer:1, last_name : 1  , job : 1 } )`
+     - ` db.people.createIndex({employer:1, last_name : -1  , job : -1 } )`
+31) How can one document be found using Atlas Data Explorer?
+   - **Answer:** Select the collection on the left-hand side. 2. Select the "Aggregation" view. 3. Specify the first stage as `$match` and ...
+32) What are two advantages to using Connection Pooling within the Java Driver?
+   - **Answer:** Reduce the latency for an application and limit the number of connections to the server
 
 ## Java
 
@@ -664,6 +686,32 @@ try {
     System.out.println(e);
 }finally{
     clientSession.close();
+}
+```
+
+### Aggregation in java
+```java
+private static void matchStage(MongoCollection<Document> accounts){
+    Bson matchStage = Aggregates.match(Filters.eq("account_id", "MDB310054629"));
+    System.out.println("Display aggregation results");
+    accounts.aggregate(Arrays.asList(matchStage)).forEach(document->System.out.print(document.toJson()));
+}
+
+private static void matchAndGroupStages(MongoCollection<Document> accounts){
+    Bson matchStage = Aggregates.match(Filters.eq("account_id", "MDB310054629"));
+    Bson groupStage = Aggregates.group("$account_type", sum("total_balance", "$balance"), avg("average_balance", "$balance"));
+    System.out.println("Display aggregation results");
+    accounts.aggregate(Arrays.asList(matchStage, groupStage)).forEach(document->System.out.print(document.toJson()));
+}
+
+
+private static void matchSortAndProjectStages(MongoCollection<Document> accounts){
+    Bson matchStage =
+            Aggregates.match(Filters.and(Filters.gt("balance", 1500), Filters.eq("account_type", "checking")));
+    Bson sortStage = Aggregates.sort(Sorts.orderBy(descending("balance")));
+    Bson projectStage = Aggregates.project(Projections.fields(Projections.include("account_id", "account_type", "balance"), Projections.computed("euro_balance", new Document("$divide", asList("$balance", 1.20F))), Projections.excludeId()));
+    System.out.println("Display aggregation results");
+    accounts.aggregate(asList(matchStage,sortStage, projectStage)).forEach(document -> System.out.print(document.toJson()));
 }
 ```
 
