@@ -9,12 +9,12 @@ db.mycollection.insertMany([
 ]);
 
 db.accounts.insertMany([
-    { account_type: 'type1', balance: 2000 },
-    { account_type: 'type1', balance: 1000 },
-    { account_type: 'checking', balance: 500 },
-    { account_type: 'checking', balance: 2000 },
-    { account_type: 'checking', balance: 3000 },
-    { account_type: 'checking', balance: 100 }
+    { account_id: "MDB12234728", account_type: 'type1', balance: 2000 },
+    { account_id: "MDB12234727", account_type: 'type1', balance: 1000 },
+    { account_id: "MDB12234726", account_type: 'checking', balance: 500 },
+    { account_id: "MDB12234725", account_type: 'checking', balance: 2000 },
+    { account_id: "MDB12234724", account_type: 'checking', balance: 3000 },
+    { account_id: "MDB12234723", account_type: 'checking', balance: 100 }
 ]);
 
 db.createUser({

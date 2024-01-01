@@ -1,4 +1,4 @@
-package ipostu.mongo.demo.part5;
+package ipostu.mongo.demo.part6;
 
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
@@ -20,9 +20,9 @@ public class App {
         MongoDatabase database = mongoClient.getDatabase("my_db");
 
         MongoCollection<Document> collection = database.getCollection("accounts");
-        Bson query = Filters.eq("account_id", "MDB12234728");
-        Bson updates = Updates.combine(Updates.set("account_status", "active"), Updates.inc("balance", 100));
-        UpdateResult upResult = collection.updateOne(query, updates);
+        Bson query  = Filters.eq("account_type","type1");
+        Bson updates  = Updates.combine(Updates.set("minimum_balance",100));
+        UpdateResult upResult = collection.updateMany(query, updates);
 
         System.out.println(upResult);
         mongoClient.close();

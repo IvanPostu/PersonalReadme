@@ -586,6 +586,22 @@ Map<Integer, BsonValue> insertedDocuments = insertManyResult.getInsertedIds();
         mongoClient.close();
 ```
 
+### Update many / one
+```java
+// many
+MongoCollection<Document> collection = database.getCollection("accounts");
+Bson query  = Filters.eq("account_type","type1");
+Bson updates  = Updates.combine(Updates.set("minimum_balance",100));
+UpdateResult upResult = collection.updateMany(query, updates);
+
+//one
+MongoCollection<Document> collection = database.getCollection("accounts");
+Bson query = Filters.eq("account_id", "MDB12234728");
+Bson updates = Updates.combine(Updates.set("account_status", "active"), Updates.inc("balance", 100));
+UpdateResult upResult = collection.updateOne(query, updates);
+
+```
+
 ## Exercise 1 
 - Create a DB and 2 collections, insert 2 records and update 1 through MongoDB-Atlas
 <img src="./forReadme/mongo1.png" alt="Image Description" >
