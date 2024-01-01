@@ -560,6 +560,32 @@ Map<Integer, BsonValue> insertedDocuments = insertManyResult.getInsertedIds();
 // {0=BsonObjectId{value=6592e45c5929350e92b905d2}, 1=BsonObjectId{value=6592e45c5929350e92b905d3}}
 ```
 
+### Find many / one
+```java
+        String connectionString = System.getProperty("mongodb.uri");
+        MongoClient mongoClient = MongoClients.create(connectionString);
+
+        MongoDatabase database = mongoClient.getDatabase("my_db");
+        MongoCollection<Document> collection = database.getCollection("accounts");
+
+        try (MongoCursor<Document> cursor = collection
+                .find(and(gte("balance", 1000), eq("account_type", "checking")))
+                .iterator()) {
+            while (cursor.hasNext()) {
+                System.out.println(cursor.next().toJson());
+            }
+        }
+        
+//        {"_id": {"$oid": "6592ec5d174f95ce4987fa56"}, "account_type": "checking", "balance": 2000.0}
+        Document firstDocument = collection
+                .find(and(gte("balance", 1000), eq("account_type", "checking")))
+                .first();
+
+//        {"_id": {"$oid": "6592ec5d174f95ce4987fa56"}, "account_type": "checking", "balance": 2000.0}
+//        {"_id": {"$oid": "6592ec5d174f95ce4987fa57"}, "account_type": "checking", "balance": 3000.0}
+        mongoClient.close();
+```
+
 ## Exercise 1 
 - Create a DB and 2 collections, insert 2 records and update 1 through MongoDB-Atlas
 <img src="./forReadme/mongo1.png" alt="Image Description" >
