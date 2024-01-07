@@ -374,6 +374,83 @@ $ const account = session.getDatabase('< add database name here>').getCollection
 $ session.commitTransaction() # or session.abortTransaction()
 ```
 
+### Query to get total sales for each customer in the year 2023
+```js
+db.orders.aggregate([
+   {
+      $match: {
+         order_date: {
+            $gte: ISODate("2022-01-01T00:00:00Z"),
+            $lt: ISODate("2022-01-01T00:00:00Z")
+         }
+      }
+   },
+   {
+      $unwind: "$items"
+   },
+   {
+      $group: {
+         _id: "$customer_id",
+         total_sales: {
+            $sum: "$items.price"
+         }
+      }
+   }
+])
+```
+
+### Query to retrieve all orders with corresponding customer information
+```js
+db.orders.aggregate([
+   {
+      $lookup: {
+         from: "customers",
+         localField: "customer_id",
+         foreignField: "customer_id",
+         as: "customer_info"
+      }
+   }
+])
+``` 
+
+### Query to calculate the average of each product and to sort result in descending order of average rating
+```js
+db.reviews.aggregate([
+   {
+      $group: {
+         _id: "$product_id",
+         avgRating: {
+            $avg: "$rating"
+         }
+      }
+   },
+   {
+      $sort: {
+         avgRating: -1
+      }
+   }
+])
+```
+
+### Combine documents from `employees` and `departments`
+```js
+db.employees.aggregate([
+   {
+      $lookup: {
+         from: "departments",
+         localField: "department_id",
+         foreignField: "_id",
+         as: "department_info"
+      }
+   }
+])
+```
+
+### Use projection for nested array
+```js
+db.developers.find({}, {tech_stack: {$slice: [0, 3]}}) // selects all developers and first 3 items from array
+```
+
 ## What is MongoDB
 It is a general purpose document database suitable for a wide range of use cases. 
 
@@ -424,6 +501,7 @@ Keys constraints:
 ## _id
 - Every document requires an `_id` field which acts as a primary key.
 - Must be unique
+- Can be of any type exept array
 - If the document doesn't include the `_id` field then MongoDB automatically generates an `ObjectId` for the `_id` field. 
 - Default type is `ObjectId` but can be used any other type
 - 12 bytes 
@@ -543,6 +621,14 @@ Data Modeling - process of defining how data is stored and relationships that ex
    - **Answer:** Select the collection on the left-hand side. 2. Select the "Aggregation" view. 3. Specify the first stage as `$match` and ...
 32) What are two advantages to using Connection Pooling within the Java Driver?
    - **Answer:** Reduce the latency for an application and limit the number of connections to the server
+33) How does MongoDB sort a collection with both numeric and string values?
+   - **Answer:** By lexicographical order e.g. [2, "10", "1"] -> ["1", "10", "2"]
+34) How to insert multiple documents into a collection, to bypass validation and to continue processing event if an error occurs during insertion?
+   - **Answer:** `db.col.insertMany([...], {validate: false, continueOfError: true})`
+35) How to drop entire collection?
+   - **Answer:** `db.col.drop()`
+36) Where the mongodb configuration file is located?
+   - **Answer:** `etc/mongod.conf`
 
 ## Java
 

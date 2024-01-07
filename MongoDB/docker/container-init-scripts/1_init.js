@@ -32,3 +32,16 @@ db.createUser({
         { role: 'readWrite', db: 'my_db' }
     ]
 });
+
+db.developers.insertMany([{
+    _id: 1,
+    fname: 'John',
+    lname: 'Smith',
+    tech_stack: ['sql', 'git', 'python', 'linux', 'django', 'aws']
+},
+{
+    _id: 2,
+    fname: 'Michael',
+    lname: 'Doe',
+    tech_stack: ['git', 'python', 'sqlite', 'linux', 'flask']
+}]);
