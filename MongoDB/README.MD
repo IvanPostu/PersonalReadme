@@ -220,6 +220,8 @@ $ db.inspections.find(
 ### Count documents
 ```sh
 $ db.collections.countDocuments(<query>, <optiona>)
+# or
+$ db.collections.find().count() # deprecated
 
 # Count number of trips over 120 minutes by subscribers
 $ db.trips.countDocuments({ tripduration: { $gt: 120 }, usertype: "Subscriber" })
@@ -434,6 +436,7 @@ db.reviews.aggregate([
 
 ### Combine documents from `employees` and `departments`
 ```js
+// local field is the field from `employees` collection
 db.employees.aggregate([
    {
       $lookup: {
@@ -450,6 +453,212 @@ db.employees.aggregate([
 ```js
 db.developers.find({}, {tech_stack: {$slice: [0, 3]}}) // selects all developers and first 3 items from array
 ```
+
+### Find total amount of orders made in month of February 2023
+```js
+db.orders.aggregate([
+   {
+      match: {
+         $gte: ISODate("2023-02-01T00:00:000Z"),
+         $lt: ISODate("2023-03-01T00:00:000Z")
+      }
+   },
+   {
+      $group: {
+         _id: null,
+         total_amount: {
+            $sum: "$total_amount"
+         }
+      }
+   }
+])
+```
+
+### `$addFields` and `$add` example
+```js
+db.players.aggregate([
+   {
+      $addFields: {
+         total_score: {
+            $sum: "$scores"
+         },
+         avg_score: {
+            $avg: "$scores"
+         }
+      }
+   },
+   {
+      $addFields: {
+         total_score_with_bonus: {
+            $add: ["$total_score", "$bonus"]
+         }
+      }
+   }
+])
+```
+
+### Find all movies that have more votes than the year in which they were released
+```js
+// Example of document:
+/*
+{
+   _id: ObjectId('573a1390f29313caabcd60e4'),
+   genres: [ 'Comedy', 'Drama' ],
+   title: 'The Immigrant',
+   year: 1917,
+   imdb: { rating: 7.1, votes: 4560, id: 7133 },
+   countries: [ 'USA' ]
+}
+*/
+
+db.movies.find({
+   $expr: {
+      $gt: ["$imdb.votes", "$year"]
+   }
+})
+```
+
+### Example of text search query
+```js
+db.movies.find(
+   {text: {$search: 'Blah blah ...'}},
+   {score: {$meta: 'textScore'}}
+).sort({score: {$meta: 'textScore'}}).limit(3); // extract only first top 3 relevant scores
+```
+
+### Retrieve total sales for each customers
+```js
+db.orders.aggregate([
+   {
+      $unwind: "$items"
+   },
+   {
+      $group: {
+         _id: "$customer_name",
+         total_sales: {
+            $sum: {
+               $multiply: ["$items.quantity", "$items.price"]
+            }
+         }
+      }
+   }
+])
+```
+
+### Avoid fields with same name in `$lookup` stage
+```js
+db.orders.aggregate([
+  {
+    $lookup: {
+      from: "customers",
+      let: { orderCustomerId: "$customerId" }, // Alias for the field in the "orders" collection
+      pipeline: [
+        {
+          $match: {
+            $expr: {
+              $eq: ["$customerId", "$$orderCustomerId"]
+            }
+          }
+        },
+        // Add more stages if needed for projecting or modifying the customer data
+      ],
+      as: "customerDetails"
+    }
+  }
+]);
+```
+### Total quantity and total revenue for each month
+```js
+db.sales.aggregate([
+   {
+      $group: {
+         _id: {
+            month: {
+               $month: "$sale_date"
+            },
+            year: {
+               $year: "$sale_date"
+            }
+         },
+         totalQuantity: {
+            $sum: "$quantity_sold"
+         },
+         totalRevenue: {
+            $sum: "$total_revenue"
+         }
+      }
+   }
+]);
+```
+
+### Attribute Pattern
+```js
+// Problem
+/**
+{
+    title: "Star Wars",
+    director: "George Lucas",
+    release_US: ISODate("1977-05-20T01:00:00+01:00"),
+    release_France: ISODate("1977-10-19T01:00:00+01:00"),
+    release_Italy: ISODate("1977-10-20T01:00:00+01:00"),
+    release_UK: ISODate("1977-12-27T01:00:00+01:00"),
+}
+Indexes
+{release_US: 1}
+{release_France: 1}
+{release_Italy: 1}
+ * /
+```
+```js
+// Fix using Attribute pattern
+/**
+{
+    title: "Star Wars",
+    director: "George Lucas",
+    …
+    releases: [
+        {
+        location: "USA",
+        date: ISODate("1977-05-20T01:00:00+01:00")
+        },
+        {
+        location: "France",
+        date: ISODate("1977-10-19T01:00:00+01:00")
+        },
+        {
+        location: "Italy",
+        date: ISODate("1977-10-20T01:00:00+01:00")
+        },
+        {
+        location: "UK",
+        date: ISODate("1977-12-27T01:00:00+01:00")
+        },
+    ],
+}
+Index
+{ "releases.location": 1, "releases.date": 1}
+*/
+```
+
+### Total quantity and total revenue for each month
+```js
+// update with positional operator
+db.students.updateOne(
+   { _id: ObjectId("5f0a7e80d8c9c7b5a48c49e1"), "courses.name": "Math" },
+   { $set: { "courses.$.grade": 95 } }
+)
+
+db.students.updateOne(
+   { _id: ObjectId("5f0a7e80d8c9c7b5a48c49e1") },
+   { $set: { "courses.2.grade": 95 } }
+)
+```
+
+### Get 10 random documents from a collection
+```js
+db.university_courses_enrolment.aggregate([{ "$sample": {size: 10} }])
+```
+
 
 ## What is MongoDB
 It is a general purpose document database suitable for a wide range of use cases. 
@@ -468,6 +677,10 @@ Keys constraints:
 - `$` and `.` are prohibited because mongo uses them internally
 - Case Sensitive
 - Duplicates aren't allowed
+
+## Tips and Tricks
+1. In a query which filter by indexed fields and in projection is specified exactly these fields (indexed), then it will work faster because it will extract data from index structure. Example of index `{title: 1, year: 1}` query: `db.movies.find({title: {$in: ['a', 'b']}}, {_id: 0, title: 1, year: 1})`
+2. MongoDB can use more than one index to optimize query.
 
 ## Terms 
 - **Document** - a basic unit of data, displayed in JSON, stored in BSON format (similar to table record in RDMS).
@@ -491,6 +704,7 @@ Keys constraints:
   - `Consistency` - all changes are consistent with database constraints
   - `Isolation` - multiple transactions can happen in the same time without affecting each other
   - `Durability` - all changes made by a transaction are persisted and will be present after failure and recovery process (guarantee that the data is saved in non-volatile memory)
+- **Change Stream** - feature which allows applications to subscribe to all data changes on a single collection or database and immediately react to them.
 
 ## Data types
 - All JSON data types
@@ -629,6 +843,52 @@ Data Modeling - process of defining how data is stored and relationships that ex
    - **Answer:** `db.col.drop()`
 36) Where the mongodb configuration file is located?
    - **Answer:** `etc/mongod.conf`
+37) Which approach should be used for time-intensive aggregation read to avoid high load on the primary database?
+   - **Answer:** To use secondary read preference for aggregation, to offload operation to a secondary member of the replica set. IMPORTANT!!! operation will have some delay in data freshness.
+38) What does `$group` stage in aggregation pipeline do?
+   - **Answer:** It creates distinct groups based on the unique values, it allows to apply aggregation operation for each group
+39) What does `db.<...coll>.insertMany([...])` return?
+   - **Answer:** `{ acknowledged: true, insertedIds: { '0': ObjectId("659b0df1970235d545291683"), ... } }`
+40) What is the most efficient way to retrieve documents based on a text search on several fields?
+   - **Answer:** 
+     - Create a text index on the fields
+     - Use `$text` operator to perform search
+41) How to force MongoDB to use a specific index or full collection scan or reverse collection scan? 
+   - **Answer:** 
+     - To use index: `db.users.find().hint( { age: 1 }` or `db.users.find().hint( "age_1" )`
+     - To perform full collection scan: `db.users.find().hint( { $natural : 1 } )`
+     - To perform reversed collection scan: `db.users.find().hint( { $natural : -1 } )`
+42) What kind of tree data structure does MongoDB use for simple indexes?
+   - **Answer:** BTree
+43) What is the main purpose of the `$where` operator?
+   - **Answer:** To filter query using a js function
+     - Ignores indexes
+     - Introduce security wholes
+     - Can be used only if scripting is enabled
+44) What does `mongorestore` command do?
+   - **Answer:** 
+     - Restore data from binary backup created by `mongodump`
+     - To add a collection from BSON file to MongoDB cluster
+45) What is the difference between `findAndModify` query with and without `{new: true}` option? 
+   - **Answer:** 
+     - without or `{new: false}` returns original document before update
+     - `{new: true}` returns modified document
+46) What does `$unwind` stage in aggregation pipeline do?
+   - **Answer:** It deconstructs nested array, creating a separate document for each item
+47) How does MongoDB handle empty values on `sort()` stage?
+   - **Answer:** Empty values are considered as `null` and they are sorted last, regardless of the sort direction ASC or DESC.
+48) In which case should be used `Attribute Pattern`?
+   - **Answer:** When some fields have similar characteristics and there is a requirement to search across those fields.
+49) What is the RAM limit of aggregation pipeline stage?
+   - **Answer:** 100MB, it means that the memory consumption for each stage should not exceed this limit, or else it may throw an Error.
+50) `$sortByCount` is equivalent to? DESC is important!!!
+   - **Answer:** `$group` + `$sort`
+     - `{ $sortByCount:  <expression> }`
+     - `    { $group: { _id: <expression>, count: { $sum: 1 } } }, { $sort: { count: -1 } }`
+51) What mechanism can be used to export data from one collection to another?
+   - **Answer:** 
+     - In the same database: `$out` aggregation stage
+     - In different database: `mongoexport` and `mongoimport`
 
 ## Java
 

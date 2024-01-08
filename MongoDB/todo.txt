@@ -1,4 +1,0 @@
-progress: 53/541
-test:(76% required):
-    - 60% 18 out of 30 :(
-
