@@ -22,6 +22,7 @@ $ mongo --host 127.0.0.1 --port 27017 -u root -p root --authenticationDatabase a
 
 # connect through cli using connection string
 $ mongo 'mongodb://root:root@localhost:27017/admin'
+$ mongo "mongodb://test2:t%25e%29s%24t2@localhost:27017/my_db"
 
 $ mongo --nodb
 > conn = new Mongo("127.0.0.1:27017")
@@ -659,6 +660,131 @@ db.students.updateOne(
 db.university_courses_enrolment.aggregate([{ "$sample": {size: 10} }])
 ```
 
+### Example of query to return all books titles that end with 'ian'
+```js
+db.books.find({title: {$regex: /.*ian$/}})
+```
+
+### Average price of items purchased by each customer
+```js
+const collectionName = 'test_00091' + Math.floor(Math.random()*9999)
+db.createCollection(collectionName);
+
+db.getCollection(collectionName).insertMany([
+    {
+        "_id": ObjectId("5f5f95aae2e85f9e7b33be5a"),
+        "customer_id": "C001",
+        "item": "shirt",
+        "price": 29.99,
+        "quantity": 2,
+        "date": ISODate("2022-03-01T08:00:00Z")
+    },
+    {
+        "_id": ObjectId("5f5f95aae2e85f9e7b33be5b"),
+        "customer_id": "C002",
+        "item": "pants",
+        "price": 39.99,
+        "quantity": 1,
+        "date": ISODate("2022-03-02T10:30:00Z")
+    },
+    {
+        "_id": ObjectId("5f5f95aae2e85f9e7b33be5c"),
+        "customer_id": "C003",
+        "item": "shoes",
+        "price": 59.99,
+        "quantity": 1,
+        "date": ISODate("2022-03-03T15:45:00Z")
+    },
+    {
+        "_id": ObjectId("5f5f95aae2e85f9e7b33be5d"),
+        "customer_id": "C001",
+        "item": "hat",
+        "price": 14.99,
+        "quantity": 3,
+        "date": ISODate("2022-03-04T12:20:00Z")
+    }
+]);
+
+db.getCollection(collectionName).aggregate([{
+   $group: {
+      _id: "$customer_id", 
+      avgPrice: {
+         $avg: {
+            $multiply: [
+               "$price", "$quantity"
+            ]
+         }
+      }
+   }
+}])
+
+db.getCollection(collectionName).drop();
+```
+
+### 
+```js
+const collectionName = 'test_00091' + Math.floor(Math.random()*9999)
+
+db.createCollection(collectionName);
+
+db.getCollection(collectionName).insertMany([
+    {
+        "username": "user1",
+        "email": "user1@example.com",
+        "age": 25,
+        "country": "USA"
+    },
+    {
+        "username": "user2",
+        "email": "user2@example.com",
+        "age": 30,
+        "country": "Canada"
+    },
+    {
+        "username": "user3",
+        "email": "user3@example.com",
+        "age": 22,
+        "country": "UK"
+    },
+    {
+        "username": "user4",
+        "email": "user4@example.com",
+        "age": 28,
+        "country": "Australia"
+    }
+]);
+
+db.createView(collectionName+ "_view", collectionName,
+[
+   {
+      $project: {
+         "username": 1,
+         "email": 1,
+         "age": 1
+      }
+   }
+]);
+// or 
+db.runCommand( { create: collectionName+"_view", viewOn: collectionName, pipeline: [
+   {
+      $project: {
+         "username": 1,
+         "email": 1,
+         "age": 1
+      }
+   }
+], /*collation: {...}*/ } )
+
+db.getCollection(collectionName+"_view").find()
+
+// MongoServerError: Namespace my_db.test_000917680_view is a view, not a collection
+db.getCollection(collectionName+"_view").updateOne({username: 'user4'}, {$set: {age: 30}})
+
+db.getCollection(collectionName+"_view").drop()
+
+db.getCollection(collectionName).drop();
+```
+
 
 ## What is MongoDB
 It is a general purpose document database suitable for a wide range of use cases. 
@@ -705,6 +831,12 @@ Keys constraints:
   - `Isolation` - multiple transactions can happen in the same time without affecting each other
   - `Durability` - all changes made by a transaction are persisted and will be present after failure and recovery process (guarantee that the data is saved in non-volatile memory)
 - **Change Stream** - feature which allows applications to subscribe to all data changes on a single collection or database and immediately react to them.
+- **Read concerns** - a.k.a. isolation levels on read:
+  - `local` - is used as default on read, the operation returns most recent data available on the node, ignoring the state of this data on other nodes in the replica set
+  - `available` - works exactly as `local` but optimized for sharded cluster
+  - `majority` - guarantee that the data has been acknowledged by a majority of the replica set members
+  - `linearizable` - guarantee that the data has been acknowledged by a majority of the replica set members, waits until write operation finishes
+  - `snapshot` - guarantee that the data has been acknowledged by a majority of the replica set members, waits until write operations with `majority` concern finishes
 
 ## Data types
 - All JSON data types
@@ -715,11 +847,11 @@ Keys constraints:
 ## _id
 - Every document requires an `_id` field which acts as a primary key.
 - Must be unique
-- Can be of any type exept array
+- Can be of any type except array
 - If the document doesn't include the `_id` field then MongoDB automatically generates an `ObjectId` for the `_id` field. 
 - Default type is `ObjectId` but can be used any other type
-- 12 bytes 
-  - first 4 bytes - seconds from beginning of the epoch
+- 12 bytes `(timestamp + (machine identifier + process identifier) + counter)`
+  - first 4 bytes - seconds since the Unix epoch
   - next 5 bytes - random value
   - next 3 bytes - counter that starts from the random value
 
@@ -889,6 +1021,36 @@ Data Modeling - process of defining how data is stored and relationships that ex
    - **Answer:** 
      - In the same database: `$out` aggregation stage
      - In different database: `mongoexport` and `mongoimport`
+52) Can `insertMany` specify explicitly to insert ordered or unordered records?
+   - **Answer:** Yes, with `ordered` flag
+53) Which is the default value for the flag `ordered` for `insertMany` operation?
+   - **Answer:** `true`
+54) What is the limit of indexes that mongo can use for a query?
+   - **Answer:** For a query mongo can't use more than one index
+55) In which cases are used hash indexes?
+   - **Answer:** 
+     - Hash indexes are used for hash based sharding
+     - Beneficial for equality operation
+     - NOT for queries on multiple fields
+     - DO NOT support range queries
+56) What happen if capped collection reach its maximum size?
+   - **Answer:** It removes the oldest documents.
+57) Can documents in capped collection be deleted manually?
+   - **Answer:** No, manual deletion is prohibited.
+58) Can the size of capped collection be changed?
+   - **Answer:** No, it is defined only once on creation.
+59) Can a capped collection be sharded?
+   - **Answer:** No, it can't be sharded.
+60) Enumerate main advantages of horizontal scaling?
+   - **Answer:** 
+     - Is cheaper than scaling vertically (adding a new machine to the cluster is generally cheaper than buying a more powerful hardware)
+     - Horizontally scaling cost increases linearly
+61) Can find using regex use an index to improve performance?
+   - **Answer:** Yes
+62) How to dump a collection to BSON file?
+   - **Answer:** `mongodump --db dbName --collection collName`
+63) Which command is used to export data to CSV or JSON?
+   - **Answer:** `mongoexport`
 
 ## Java
 
