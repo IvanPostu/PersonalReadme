@@ -785,6 +785,25 @@ db.getCollection(collectionName+"_view").drop()
 db.getCollection(collectionName).drop();
 ```
 
+### Example of query to return all movies that include both genres 'Crime' and 'Mystery'
+```js
+db.movies.find( { genres: { $all: ["Crime", "Mystery"] } } )
+```
+
+### Create a capped collection
+```js
+db.createCollection('latest_news', {'capped': true, 'size': 10000, 'max': 3})
+```
+
+### Find documents with exactly 5 languages (5 items in an array)
+```js
+db.movies.find( { languages: { $size: 5 } } )
+```
+
+### Create 2dsphere geospatial index
+```js
+db.shipwrecks.createIndex({'coordinates': '2dsphere'})
+```
 
 ## What is MongoDB
 It is a general purpose document database suitable for a wide range of use cases. 
@@ -831,12 +850,19 @@ Keys constraints:
   - `Isolation` - multiple transactions can happen in the same time without affecting each other
   - `Durability` - all changes made by a transaction are persisted and will be present after failure and recovery process (guarantee that the data is saved in non-volatile memory)
 - **Change Stream** - feature which allows applications to subscribe to all data changes on a single collection or database and immediately react to them.
-- **Read concerns** - a.k.a. isolation levels on read:
+- **Read concerns** - a.k.a. isolation levels on read (`db.collection.find().readConcern(<level>)`)
   - `local` - is used as default on read, the operation returns most recent data available on the node, ignoring the state of this data on other nodes in the replica set
   - `available` - works exactly as `local` but optimized for sharded cluster
   - `majority` - guarantee that the data has been acknowledged by a majority of the replica set members
   - `linearizable` - guarantee that the data has been acknowledged by a majority of the replica set members, waits until write operation finishes
   - `snapshot` - guarantee that the data has been acknowledged by a majority of the replica set members, waits until write operations with `majority` concern finishes
+- **Computed pattern** - In MongoDB, a computed pattern refers to the use of aggregation pipelines or other mechanisms to derive and generate calculated or computed fields within a document or a result set based on specified criteria or expressions. It involves the dynamic creation or transformation of data based on predefined rules or computations.
+- **The Outlier Pattern** - involves handling exceptional cases or outliers that don't fit within the standard data model.
+- **Schema Versioning Pattern** - is typically used when making changes to the structure of the data model while maintaining backward compatibility with existing data. 
+- **Cardinality** - uniqueness of the values in a column that is being indexed
+  - `high` - values almost are unique
+  - `low` - a lot of repeated values
+
 
 ## Data types
 - All JSON data types
@@ -1049,8 +1075,29 @@ Data Modeling - process of defining how data is stored and relationships that ex
    - **Answer:** Yes
 62) How to dump a collection to BSON file?
    - **Answer:** `mongodump --db dbName --collection collName`
-63) Which command is used to export data to CSV or JSON?
-   - **Answer:** `mongoexport`
+63) Which command is used to export/import data to CSV or JSON?
+   - **Answer:** `mongoexport` and `mongoimport`
+64) How does MongoDB handle sorting on fields with arrays as values in a collection ?
+   - **Answer:** By the first element, if the first element are of different type, then it will be sorted by lexicographical order.
+65) What is the difference between sparse and non-sparse index?
+   - **Answer:** 
+     - `sparse` - `db.university_courses.createIndex({entryType: 1}, {sparse: true})` documents for that the indexed field(s) is not present are ignored
+     - `non-sparse` - by default, all documents are indexed
+66) How is calculated namespace value for a collection?
+   - **Answer:** `db_name.collection_name`
+67) When sharding a MongoDB collection, what is the main factor that determines the distribution of data across shards?
+   - **Answer:** The value of shard key
+68) What data structure is used to store the newly created index?
+   - **Answer:** B-Tree
+69) In which cases should be used The Bucket Pattern?
+   - **Answer:** 
+     - To split a big documents into sub-documents.
+     - For hierarchical structures
+70) In a MongoDB database with referenced relationships, what is the advantage of using a separate collection for each entity over using a single collection for all entities?
+   - **Answer:** Improved maintainability and reduced complexity of updates to related entities
+71) What happens to the index entries after `db.collection.deleteMany()`?
+   - **Answer:** They are immediately removed from the index
+
 
 ## Java
 
