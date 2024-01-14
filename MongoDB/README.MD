@@ -855,7 +855,7 @@ Keys constraints:
   - `available` - works exactly as `local` but optimized for sharded cluster
   - `majority` - guarantee that the data has been acknowledged by a majority of the replica set members
   - `linearizable` - guarantee that the data has been acknowledged by a majority of the replica set members, waits until write operation finishes
-  - `snapshot` - guarantee that the data has been acknowledged by a majority of the replica set members, waits until write operations with `majority` concern finishes
+  - `snapshot` - guarantee that the data has been acknowledged by a majority of the replica set members, waits until write operations with `majority` concern finishes (provide session consistency)
 - **Computed pattern** - In MongoDB, a computed pattern refers to the use of aggregation pipelines or other mechanisms to derive and generate calculated or computed fields within a document or a result set based on specified criteria or expressions. It involves the dynamic creation or transformation of data based on predefined rules or computations.
 - **The Outlier Pattern** - involves handling exceptional cases or outliers that don't fit within the standard data model.
 - **Schema Versioning Pattern** - is typically used when making changes to the structure of the data model while maintaining backward compatibility with existing data. 
@@ -1097,6 +1097,36 @@ Data Modeling - process of defining how data is stored and relationships that ex
    - **Answer:** Improved maintainability and reduced complexity of updates to related entities
 71) What happens to the index entries after `db.collection.deleteMany()`?
    - **Answer:** They are immediately removed from the index
+72) What is the difference between the `db.collection.deleteOne()` and `db.collection.deleteMany()` methods in MongoDB when it comes to document removal from a replica set?
+   - **Answer:** `deleteOne()` removes the document from all nodes in the replica set, while `deleteMany()` removes the document from the primary node only
+73) In MongoDB, what is the best practice for performing maintenance tasks such as backup and index rebuilds?
+   - **Answer:** Use a replica set and perform the maintenance tasks on a secondary node
+74) Which of the following is considered an anti-pattern in MongoDB data modeling for real-time data processing applications?
+   - **Answer:** Over-normalizing data to reduce the chances of data inconsistencies
+75) Which of the following is considered an anti-pattern in MongoDB data modeling for hierarchical data structures?
+   - **Answer:** Using nested arrays to model hierarchical data due to risk of of exceeding the maximum document size
+76) How does the db.collection.deleteMany() method in MongoDB handle document references in other collections when deleting documents from a sharded collection?
+   - **Answer:** It raises an error if any references to the deleted documents exist in other collections
+77) ________
+   - **Answer:** AAAAAnswr
+78) ________
+   - **Answer:** AAAAAnswr
+79) ________
+   - **Answer:** AAAAAnswr
+80) ________
+   - **Answer:** AAAAAnswr
+81) ________
+   - **Answer:** AAAAAnswr
+82) ________
+   - **Answer:** AAAAAnswr
+83) ________
+   - **Answer:** AAAAAnswr
+84) ________
+   - **Answer:** AAAAAnswr
+85) ________
+   - **Answer:** AAAAAnswr
+86) ________
+   - **Answer:** AAAAAnswr
 
 
 ## Java
