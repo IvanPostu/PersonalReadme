@@ -1,5 +1,9 @@
 package ipostu.mongo.demo;
 
+import ch.qos.logback.classic.Level;
+import com.mongodb.ConnectionString;
+import com.mongodb.MongoClientSettings;
+import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.AfterEach;
@@ -12,6 +16,11 @@ import java.util.List;
 
 class MongoCreateTests {
     private static final Logger LOG = LoggerFactory.getLogger(MongoCreateTests.class);
+    static {
+        ((ch.qos.logback.classic.Logger)LOG).setLevel(Level.DEBUG);
+    }
+    private static final ConnectionString connectionString = new ConnectionString("mongodb://test2:t%25e%29s%24t2@localhost:27017/my_db");
+
     private final List<Runnable> cleanupCallbacks = new LinkedList<>();
 
     @AfterEach
@@ -24,16 +33,16 @@ class MongoCreateTests {
         String collectionSuffix = RandomStringUtils.randomAlphabetic(10);
         String collectionName = "students" + "_" + collectionSuffix;
 
-        MongoDatabase database = MongoTestConfiguration.getDatabase();
+        MongoClientSettings mongoClientSettings = MongoClientSettings.builder()
+                .applyConnectionString(connectionString)
+                .build();
+        MongoDatabase database = MongoClients.create(mongoClientSettings).getDatabase("my_db");
         database.createCollection(collectionName);
 
-        LOG.debug("Debug log message");
-        LOG.info("Info log message");
-        LOG.error("Error log message");
 
         cleanupCallbacks.add(() -> {
             database.getCollection(collectionName).drop();
-            LOG.error("Collection: {} was successfully dropped", collectionName);
+            LOG.info("Collection: {} was successfully dropped", collectionName);
         });
     }
 

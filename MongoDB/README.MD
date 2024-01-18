@@ -795,6 +795,11 @@ db.movies.find( { genres: { $all: ["Crime", "Mystery"] } } )
 db.createCollection('latest_news', {'capped': true, 'size': 10000, 'max': 3})
 ```
 
+### Use first element of inner array
+```js
+db.sales.find( { 'items.tags.0': 'office' } )
+```
+
 ### Find documents with exactly 5 languages (5 items in an array)
 ```js
 db.movies.find( { languages: { $size: 5 } } )
@@ -803,6 +808,20 @@ db.movies.find( { languages: { $size: 5 } } )
 ### Create 2dsphere geospatial index
 ```js
 db.shipwrecks.createIndex({'coordinates': '2dsphere'})
+```
+
+### Explain the query
+```js
+db.companies.insertMany([
+   {"_id": 1, "name": "Facebook"}, 
+   {"_id": 1, "name": "Twitter"}, 
+   {"_id": 2, "name": "Tesla"},
+   {"_id": 3, "name": "Amazon"}
+], {"ordered": false})
+
+// This insert is unordered
+// MongoDB will insert each document with a unique _id value into the collection
+// Three documents will be inserted into the collection. The documents with _id values 1 (the first one with "Facebook"), 2, and 3 will be successfully inserted. The second document with _id 1 ("Twitter") will cause a duplicate key error and will not be inserted because the operation is unordered and it allows the remaining documents to be inserted even after encountering an error.
 ```
 
 ## What is MongoDB
@@ -1107,10 +1126,10 @@ Data Modeling - process of defining how data is stored and relationships that ex
    - **Answer:** Using nested arrays to model hierarchical data due to risk of of exceeding the maximum document size
 76) How does the db.collection.deleteMany() method in MongoDB handle document references in other collections when deleting documents from a sharded collection?
    - **Answer:** It raises an error if any references to the deleted documents exist in other collections
-77) ________
-   - **Answer:** AAAAAnswr
-78) ________
-   - **Answer:** AAAAAnswr
+77) How does using a MongoDB replica set improve read performance and what needs to be considered?
+   - **Answer:** A MongoDB replica set improves read performance by enabling read operations to be distributed across multiple secondary nodes. However, read operations on secondary nodes may return stale data.
+78) Suppose we have a `products` collection what is the best shard key field?
+   - **Answer:** `product_code` as the shard key can be a good option because it has unique values for each product. Using a shard key with high cardinality, such as `product_code`, can distribute the data evenly across shards, minimizing hotspots and ensuring efficient query performance.
 79) ________
    - **Answer:** AAAAAnswr
 80) ________
