@@ -2,6 +2,7 @@ package ipostu.mongo.demo;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import ipostu.mongo.demo.common.utils.ObjectMapperProvider;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -9,7 +10,7 @@ import java.io.InputStream;
 import java.util.Objects;
 
 public final class DatasetLoader {
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    private static final ObjectMapper OBJECT_MAPPER = ObjectMapperProvider.getInstance();
 
     private DatasetLoader() {
     }
