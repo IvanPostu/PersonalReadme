@@ -824,6 +824,21 @@ db.companies.insertMany([
 // Three documents will be inserted into the collection. The documents with _id values 1 (the first one with "Facebook"), 2, and 3 will be successfully inserted. The second document with _id 1 ("Twitter") will cause a duplicate key error and will not be inserted because the operation is unordered and it allows the remaining documents to be inserted even after encountering an error.
 ```
 
+### $unset example
+```js
+db.users.update(
+   { "_id": ObjectId("5f88255ab9a5b85a3c86f61a") },
+   { $unset: { "age": "" } }
+)
+
+// After running this operation, the document will be modified as follows:
+{
+   "_id": ObjectId("5f88255ab9a5b85a3c86f61a"),
+   "username": "john_doe",
+   "email": "john@example.com"
+}
+```
+
 ## What is MongoDB
 It is a general purpose document database suitable for a wide range of use cases. 
 

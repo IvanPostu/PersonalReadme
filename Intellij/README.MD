@@ -14,3 +14,5 @@
 ## Add selection for next occurrence
 - <img src="./forReadme/idea3.png" alt="Image Description" height="400px" >
 
+## Show type when `var` is used
+- <img src="./forReadme/idea4.png" alt="Image Description" height="250px" >
