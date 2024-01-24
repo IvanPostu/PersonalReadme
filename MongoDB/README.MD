@@ -166,7 +166,7 @@ $ db.collection.updateOne(filter, update, options);
 # upsert: true|false which if is true creates a new document if it doesn't exists
 
 # updateOne + findOne
-$ db.collection.findAndModify({query:{...}, update:{...}, new:true|false});
+$ db.collection.findAndModify({query:{...}, update:{...}, new:true|false(default), upsert:true|false(default)});
 # E.g. query and update fields are required
 $ db.channels.findAndModify({
   query: { _id: ObjectId("1111a92dfee1ff300dc80bf1") },
