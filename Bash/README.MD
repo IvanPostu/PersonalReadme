@@ -4,7 +4,7 @@
 ```bash
 while true; do
 
-    notify-send -t 10000 "Take care of your eyes" "Do exercises with your eyes 20 seconds"
+    notify-send -t 10000 "Take care of your eyes" "Do exercises with your eyes 20 minutes"
 
     sleep 20m
 done
