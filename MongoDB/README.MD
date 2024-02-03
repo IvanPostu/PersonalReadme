@@ -1151,10 +1151,11 @@ Data Modeling - process of defining how data is stored and relationships that ex
    - **Answer:** Yes
 81) Which read preference options may not result in out-of-date data?
    - **Answer:** `primary`
-82) What does the statement `rs.add(node3, {priority: 0, hidden: true})` do?
+82) What does the statement `rs.add(node3, {priority: 0, hidden: true, "bulidIndexes": false})` do?
    - **Answer:** 
      - `priority: 0` means the node won't participate in elections for primary node
-     - `hidden: true` makes the node hidden
+     - `hidden: true` makes the node hidden, clients can't connect to them
+     - `"bulidIndexes": false` disabling index replication
 83) The find statement `db.movies.find( { genres: "Drama" } ).sort( { title: 1 } )` can use the index `{ title: 1 }`?
    - **Answer:** Yes
 84) What is the process for adding a new member to an existing MongoDB replica set?
@@ -1183,19 +1184,73 @@ Data Modeling - process of defining how data is stored and relationships that ex
    - **Answer:** Upgrade the secondary members one at a time, wait for the upgraded members to catch up to the primary, and then upgrade the primary member. 
 95) What is the proper process for migrating a MongoDB sharded cluster to a new set of servers?
    - **Answer:** Use the migration tool provided by MongoDB to transfer the data and configuration from the current sharded cluster to the new sharded cluster.
-96) ________
+96) What command should you use to check the status of the replica set?
+   - **Answer:** `rs.status()`
+97) What is the impact of choosing a shard key that has a low cardinality for a MongoDB sharded cluster that experiences a high write volume?
+   - **Answer:** It increases the risk of hot-spotting.
+98) Which of the following actions are granted to the built-in userAdmin role?
+   - **Answer:** 
+     - `dropUser`, `createUser`, `dropRole`, `createRole`
+99) How to shutdown the server?
+   - **Answer:** 
+     - `use admin;`
+     - `db.shutdownServer()`
+100) In MongoDB's sharding architecture, what factors should be considered when choosing the primary shard for a newly created sharded collection?
+   - **Answer:** 
+     - The available disk space on each shard
+     - The read and write capacity of each shard
+     - The existing distribution of data across shards
+101) How to display detailed information about the `accounts` collection (number of documents, collection size, number of indexes)
+   - **Answer:** `db.accounts.stats()`
+102) What is the role of an arbiter in a MongoDB replica set?
+   - **Answer:** 
+     - To facilitate elections for primary node selection
+     - To increase the number of voting members in a replica set
+103) When using the `explain()` method to obtain a query plan for a query, what does the `"winningPlan"` field indicate in the output of `explain()`?
+   - **Answer:** The lowest cost query plan considered by the query optimizer
+104) What should you take into account when call `    mongod --port 35000 --dbpath /home/user/mongodb/data --fork` ?
+   - **Answer:** to specify `--logpath`. When starting a MongoDB instance using the `--fork` option, the `--logpath` option must also be specified. The `--fork` option allows the process to run in the background, and the `--logpath` option specifies the path to the log file where the mongod process will write its output. Without a `--logpath`, the `--fork` operation does not know where to redirect its output, hence the mongod instance will not start.
+105) What is the role of the oplog in MongoDB Replica Sets?
+   - **Answer:** It is a capped collection that stores all write operations performed on the primary node, allowing secondaries to stay up-to-date with the primary. 
+106) In a MongoDB replica set, what is the purpose of the arbiter?
+   - **Answer:** The arbiter acts as a tiebreaker during the election of a new primary replica set member
+107) How to specify path to db in config file?
+   - **Answer:** `storage: dbPath: /var/mongodb/db`
+108) At what level in MongoDB, the WiredTiger storage engine provides concurrency?
+   - **Answer:** Document level concurrency because it uses an approach called MultiVersion Concurrency Control (MVCC) to handle multiple requests to the same document.
+109) In MongoDB, how does the query optimizer determine which index to use for a query that matches multiple indexes?
+   - **Answer:** The query optimizer uses the index with the most selective conditions. 
+110) What is the role of the `replication oplog` in the context of MongoDB replication?
+   - **Answer:** The `replication oplog` is used to track changes to the data in the primary node, allowing the secondary nodes to stay in sync.
+111) What is the minimum size for the `oplog` of a newly added member in order for it to successfully sync with the primary?
+   - **Answer:**  In order for a new member to successfully sync with the primary, it needs to have an `oplog` that is at least as large as the largest oplog of any existing secondary
+112) What is the purpose of the --replSet option in the context of MongoDB server administration?
+   - **Answer:** The `--replSet` option is used to configure the MongoDB server to create a new replica set as the primary member.
+113) How to create the initial database users in MongoDB while authentication is enabled?
+   - **Answer:** 
+     - Connect to MongoDB via localhost.
+     - Switch to `admin` database.
+     - Create a user administrator with the role `userAdminAnyDatabase`
+     - Authenticate as the new user administrator.
+     - Create additional users as the user administrator.
+114) How does the WiredTiger storage engine in MongoDB manage disk space utilization?
+   - **Answer:** By using a dynamic approach to disk space allocation.
+115) What is the proper process for rotating the SSL/TLS certificates on a MongoDB server?
+   - **Answer:** Stop the mongod process, replace the SSL/TLS certificates on the server, and then restart the mongod process using the `--tlsCAFile` option to specify the location of the new CA certificate. 
+116) Which of the following best describes the purpose of the "queryPlanner" stage in a MongoDB query plan?
+   - **Answer:** It generates a list of candidate query plans and calculates the cost of each plan.
+117) When should you use the `mongos` process in MongoDB server administration?
+   - **Answer:** When you want to connect to a replica set in a sharded cluster.
+118) How to configure MongoDB to enforce authentication by adding the correct configuration file option
+   - **Answer:** `net: authorization: enabled`
+119) When should you use the `mongos` process in MongoDB server administration?
+   - **Answer:** MongoDB uses a sharded cluster architecture to horizontally scale data storage and processing across multiple servers. In a sharded cluster, data is partitioned across multiple shards, each of which is a standalone replica set.
+     - The `mongos` process acts as a routing service for clients connecting to a sharded cluster, directing read and write operations to the appropriate shard based on the shard key. The mongos process does not store data, but instead acts as a coordinator for the sharded cluster. When connecting to a sharded cluster, clients should connect to the `mongos` instances rather than directly to the individual shards. This enables the `mongos` process to direct operations to the correct shard, balance the load across the cluster, and ensure data consistency. It's important to note that the `mongos` process should only be used in a sharded cluster configuration, and not in a standalone or replica set configuration. Additionally, the `mongos` process should be deployed in a highly available configuration, with multiple instances running in different network locations, to ensure high availability and fault tolerance.
+120) ________
    - **Answer:** AAAAAnswr
-97) ________
+121) ________
    - **Answer:** AAAAAnswr
-98) ________
-   - **Answer:** AAAAAnswr
-99) ________
-   - **Answer:** AAAAAnswr
-100) ________
-   - **Answer:** AAAAAnswr
-101) ________
-   - **Answer:** AAAAAnswr
-102) ________
+122) ________
    - **Answer:** AAAAAnswr
 
 
