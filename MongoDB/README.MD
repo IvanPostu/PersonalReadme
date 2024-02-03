@@ -1246,11 +1246,31 @@ Data Modeling - process of defining how data is stored and relationships that ex
 119) When should you use the `mongos` process in MongoDB server administration?
    - **Answer:** MongoDB uses a sharded cluster architecture to horizontally scale data storage and processing across multiple servers. In a sharded cluster, data is partitioned across multiple shards, each of which is a standalone replica set.
      - The `mongos` process acts as a routing service for clients connecting to a sharded cluster, directing read and write operations to the appropriate shard based on the shard key. The mongos process does not store data, but instead acts as a coordinator for the sharded cluster. When connecting to a sharded cluster, clients should connect to the `mongos` instances rather than directly to the individual shards. This enables the `mongos` process to direct operations to the correct shard, balance the load across the cluster, and ensure data consistency. It's important to note that the `mongos` process should only be used in a sharded cluster configuration, and not in a standalone or replica set configuration. Additionally, the `mongos` process should be deployed in a highly available configuration, with multiple instances running in different network locations, to ensure high availability and fault tolerance.
-120) ________
+120)  What should be done in case if one of the shards is experiencing high disk usage, which is causing performance issues for the cluster?
+   - **Answer:** Migrate the data from the affected shard to a new shard with more disk space
+121) What should be done in case if primary member of one of the replica sets has run out of disk space
+   - **Answer:** Remove the primary member from the replica set and add a new member in its place.
+122) What is the recommended approach for handling slow queries in a MongoDB deployment?
+   - **Answer:** By using the MongoDB profiler to identify slow queries and optimize the schema.
+123) What is the impact of choosing a compound shard key for a MongoDB sharded cluster?
+   - **Answer:** It allows for more fine-grained control over the data distribution.
+124) What is the preferred method for managing disk space usage in a MongoDB deployment with multiple replicas?
+   - **Answer:** Enabling the use of disk quotas in the operating system to limit the disk space usage of each replica set member
+125) What is replication lag?
+   - **Answer:** a delay between an operation on the primary and the application of that operation from the oplog to the secondary
+126) What is the purpose of the mongos process in a MongoDB sharded cluster?
+   - **Answer:** To provide a centralized query interface for clients connecting to the sharded cluster
+127) Which MongoDB role is specifically designed to provide the ability to monitor and retrieve server statistics, to access the system profile collection and to view the server's list of databases and their statistics?
+   - **Answer:** `clusterMonitor` role
+128) What is the impact of choosing a shard key that has low write activity for a MongoDB sharded cluster that experiences a high read volume?
+   - **Answer:** It improves the overall read performance of the cluster.
+129) What is the best way to ensure data consistency and availability in a MongoDB deployment that spans multiple geographic locations?
+   - **Answer:** By using a MongoDB sharded cluster with multiple replica sets
+130) ________
    - **Answer:** AAAAAnswr
-121) ________
+131) ________
    - **Answer:** AAAAAnswr
-122) ________
+132) ________
    - **Answer:** AAAAAnswr
 
 
