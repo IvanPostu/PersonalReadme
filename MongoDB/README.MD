@@ -1145,21 +1145,57 @@ Data Modeling - process of defining how data is stored and relationships that ex
    - **Answer:** A MongoDB replica set improves read performance by enabling read operations to be distributed across multiple secondary nodes. However, read operations on secondary nodes may return stale data.
 78) Suppose we have a `products` collection what is the best shard key field?
    - **Answer:** `product_code` as the shard key can be a good option because it has unique values for each product. Using a shard key with high cardinality, such as `product_code`, can distribute the data evenly across shards, minimizing hotspots and ensuring efficient query performance.
-79) ________
+79) How to get execution statistics for the query plan using `explain()` statement? 
+   - **Answer:** Example `db.accounts.find().sort({account_id: -1}).explain("executionStats")`
+80) Is `db.accounts.find().sort({account_id: -1}).explain("queryPlanner")` same as `db.accounts.find().sort({account_id: -1}).explain()` ? 
+   - **Answer:** Yes
+81) Which read preference options may not result in out-of-date data?
+   - **Answer:** `primary`
+82) What does the statement `rs.add(node3, {priority: 0, hidden: true})` do?
+   - **Answer:** 
+     - `priority: 0` means the node won't participate in elections for primary node
+     - `hidden: true` makes the node hidden
+83) The find statement `db.movies.find( { genres: "Drama" } ).sort( { title: 1 } )` can use the index `{ title: 1 }`?
+   - **Answer:** Yes
+84) What is the process for adding a new member to an existing MongoDB replica set?
+   - **Answer:** Connect to the primary member, add the new member to the replica set configuration, initiate a resync on the new member, and wait for the new member to become a secondary.
+85) How can be launched mongod instance with a specific configuration file?
+   - **Answer:** 
+     - `mongod -f blah.conf`
+     - `mongod --config blah.conf`
+86) How to stop the operation with the `opid` = 14252?
+   - **Answer:** `db.killOp(14252)`
+87) Where is collection metadata stored in a sharded cluster?
+   - **Answer:** On the configuration servers.
+88) Which of the following options represents the default configurations for the MongoDB mongod process?
+   - **Answer:** Default port: 27017, Authentication enabled: true, WiredTiger storage engine, Journaling enabled
+89) What is the purpose of the mongos process in a MongoDB sharded cluster, and how does it handle write operations?
+   - **Answer:** The `mongos` process is responsible for routing both read and write operations to the appropriate shards in the cluster, and it uses a write concern mechanism to ensure data durability.
+90) What is the purpose of a covered query in a MongoDB sharded cluster?
+   - **Answer:** To ensure that the query can be executed entirely within a single shard
+91) What is the impact of choosing a monotonically increasing shard key for a MongoDB sharded cluster that experiences a high write volume?
+   - **Answer:** It increases the risk of hot spotting.
+92) Which of the following roles provides minimal privileges needed for backing up data in MongoDB?
+   - **Answer:** `backup`
+93) What is the role of the mongod process in MongoDB?
+   - **Answer:** The `mongod` process is responsible for managing client connections and executing database operations .
+94) What is the correct process for upgrading a MongoDB replica set to a new version of MongoDB?
+   - **Answer:** Upgrade the secondary members one at a time, wait for the upgraded members to catch up to the primary, and then upgrade the primary member. 
+95) What is the proper process for migrating a MongoDB sharded cluster to a new set of servers?
+   - **Answer:** Use the migration tool provided by MongoDB to transfer the data and configuration from the current sharded cluster to the new sharded cluster.
+96) ________
    - **Answer:** AAAAAnswr
-80) ________
+97) ________
    - **Answer:** AAAAAnswr
-81) ________
+98) ________
    - **Answer:** AAAAAnswr
-82) ________
+99) ________
    - **Answer:** AAAAAnswr
-83) ________
+100) ________
    - **Answer:** AAAAAnswr
-84) ________
+101) ________
    - **Answer:** AAAAAnswr
-85) ________
-   - **Answer:** AAAAAnswr
-86) ________
+102) ________
    - **Answer:** AAAAAnswr
 
 
