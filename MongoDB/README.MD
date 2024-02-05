@@ -1266,11 +1266,43 @@ Data Modeling - process of defining how data is stored and relationships that ex
    - **Answer:** It improves the overall read performance of the cluster.
 129) What is the best way to ensure data consistency and availability in a MongoDB deployment that spans multiple geographic locations?
    - **Answer:** By using a MongoDB sharded cluster with multiple replica sets
-130) ________
+130) How does MongoDB store information about the location of documents in the cluster?
+   - **Answer:** MongoDB groups documents into chunks, which are broken down by a shard key. MongoDB doesn't store information about the location of each document, only information about the range of keys stored on each shard.
+131) How to display detailed information about the currently used database (number of collections, database size, number of indexes)?
+   - **Answer:** `db.stats()`
+132) What are targeted queries in MongoDB?
+   - **Answer:** Queries that are sent to a single shard or a selected subset of shards based on the shard key.
+133) What is the name of a special global variable designed to work with sharding in MongoDB?
+   - **Answer:** `sh`
+134) How can you optimize the performance of a MongoDB deployment that experiences high read and write load?
+   - **Answer:** By enabling the use of in-memory storage for frequently accessed data
+135) How does the `mongos` process handle read operations in a MongoDB sharded cluster, and what factors can impact its performance?
+   - **Answer:** The `mongos` process routes read operations to multiple shards in the cluster based on the distribution of the data, and its performance can be impacted by the number of shards, the distribution of data across the shards, and the load on the shards being queried.
+136) MongoDB deployment that consists of a replica set with three members: primary, secondary, and arbiter. The primary member experiences a hardware failure and becomes unavailable. Which of the following steps should be taken to restore the replica set to a fully functional state?
+   - **Answer:** Promoting the secondary member to become the new primary
+137) What could be the cause of increased number of page faults?
+   - **Answer:** The database server has too little RAM
+138) What set of commands should be run to set up a replica set and add 2 other nodes?
+   - **Answer:** `rs.initiate(); rs.add(node2); rs.add(node3);`
+139) Which tool can be used for monitoring the health and performance of the database?
+   - **Answer:** Ops Manager is a comprehensive tool specifically designed for managing and monitoring MongoDB at scale. It provides real-time reporting, custom alerts, and metrics that give insights into performance and help you identify potential issues before they become problems.
+140) The application requires a high level of durability to ensure data integrity. 
+   - **Answer:** Enabling journaling with the write concern set to "majority"
+141) What command should be run on the primary before restarting it?
+   - **Answer:** `rs.stepDown()` to make it secondary
+142) Which of the following built-in roles provides the greatest cluster management access?
+   - **Answer:** `clusterAdmin`
+143) How can be configured the behavior of the `mongos` process in a MongoDB sharded cluster when it comes to handling read requests?
+   - **Answer:** By setting the `readPreference` configuration option
+144) In a MongoDB database with referenced relationships, what is the advantage of using a separate collection for each entity over using a single collection for all entities?
+   - **Answer:** Improved maintainability and reduced complexity of updates to related entities.
+145) ________
    - **Answer:** AAAAAnswr
-131) ________
+146) ________
    - **Answer:** AAAAAnswr
-132) ________
+147) ________
+   - **Answer:** AAAAAnswr
+148) ________
    - **Answer:** AAAAAnswr
 
 
