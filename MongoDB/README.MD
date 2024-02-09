@@ -1296,13 +1296,76 @@ Data Modeling - process of defining how data is stored and relationships that ex
    - **Answer:** By setting the `readPreference` configuration option
 144) In a MongoDB database with referenced relationships, what is the advantage of using a separate collection for each entity over using a single collection for all entities?
    - **Answer:** Improved maintainability and reduced complexity of updates to related entities.
-145) ________
+145) In a sharded MongoDB cluster, what considerations should be taken into account when selecting a shard key?
+   - **Answer:** 
+     - The shard key should distribute the data evenly across the shards.
+     - The shard key should be immutable to ensure consistent data distribution.
+     - The shard key should have a high cardinality to avoid hotspots.
+     - The shard key should be a single field rather than a compound key (recommended)
+146) What is the built-in database called config in MongoDB for?
+   - **Answer:** The config database is used to store information about shards in shared MongoDB cluster. 
+147) What role does the `mongos` process play in a MongoDB sharded cluster, and how does it ensure data consistency between shards?
+   - **Answer:** The `mongos` process is responsible for routing both read and write operations to the appropriate shards in the cluster, and it ensures data consistency between shards by using a distributed lock mechanism.
+148) Indexes on a field with values of varying data types
+   - **Answer:** Values are ordered by data type, then by value.
+149) What is an arbiter in replica set?
+   - **Answer:** Special type of replica set member. An arbiter doesn't have a copy of the data set and can't become a primary but it participates in elections for primary.
+150) What is the role of the `userAdminAnyDatabase` role in MongoDB?
+   - **Answer:** It allows a user to perform administrative tasks on any database in the deployment.
+151) What is the purpose of the nojournal option in the context of MongoDB server administration?
+   - **Answer:** The nojournal option is used to configure the MongoDB server to not use journaling for write operations
+152) Which built-in role is specifically designed to grant a user the privileges needed to create and modify the database's design, but does not permit any data modification actions on the existing data?
+   - **Answer:** `dbAdmin`
+153) In cases of connectivity issues with a MongoDB deployment. Which steps should be taken to troubleshoot and resolve the problem?
+   - **Answer:** 
+     - Check the network connectivity between the client and the MongoDB server.
+     - Verify that the MongoDB server is running and accessible.
+     - Review the firewall configuration to ensure it allows traffic on the MongoDB port.
+154) Which of the following tasks can help improve the performance and efficiency of the database?
+   - **Answer:** 
+     - Compact the database files.
+     - Create compound indexes. 
+     - Utilize the WiredTiger storage engine. 
+155) Which of the following commands are valid to start a `mongod`?
+   - **Answer:** 
+     - `mongod --logpath /var/log/mongo/mongod.log --dbpath /data/db --fork `
+     - `mongod -f /etc/mongod.conf`
+156) How to use `mongodump` utility?
+   - **Answer:** `mongodump --db yourDB --out /backup`
+157) In MongoDB, what is the purpose of the WiredTiger storage engine and how does it differ from the MMAPv1 storage engine?
+   - **Answer:** The `WiredTiger` storage engine is primarily focused on data durability and supports journaling for crash recovery. It differs from the `MMAPv1` storage engine by utilizing a copy-on-write mechanism for data modifications.
+158) What is the purpose of the MongoDB key file in a replica set deployment?
+   - **Answer:** To secure the replica set election process.
+159) How to specify `keyfile`?
+   - **Answer:** 
+```
+       security:
+         keyFile: /var/mongodb/pki/node1/keyfile
+```
+160) Which method should you use to reconfigure a replica set by applying a new replica set configuration?
+   - **Answer:** `rs.reconfig()`
+161) How is data distributed across shards in a sharded MongoDB cluster?
+   - **Answer:** By hashed index
+162) Configuration that you should choose for your production MongoDB cluster to ensure that your systems are highly available.
+   - **Answer:** 
+```
+- deploy config servers as a 3 member replica set
+
+- deploy each shard as a 3 member replica set
+
+- deploy one or more mongos routers
+```
+163) Which method should you use to display the replica set configuration?
+   - **Answer:** `rs.conf()`
+164) What operation is required before sharding a collection by running the `sh.shardCollection()` command in the mongo shell?
+   - **Answer:** create an index on the shard key
+165) ________
    - **Answer:** AAAAAnswr
-146) ________
+166) ________
    - **Answer:** AAAAAnswr
-147) ________
+167) ________
    - **Answer:** AAAAAnswr
-148) ________
+168) ________
    - **Answer:** AAAAAnswr
 
 
