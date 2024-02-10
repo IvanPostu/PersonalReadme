@@ -1359,10 +1359,12 @@ Data Modeling - process of defining how data is stored and relationships that ex
    - **Answer:** `rs.conf()`
 164) What operation is required before sharding a collection by running the `sh.shardCollection()` command in the mongo shell?
    - **Answer:** create an index on the shard key
-165) ________
+165) ____ ???
    - **Answer:** AAAAAnswr
-166) ________
-   - **Answer:** AAAAAnswr
+166) Select advantages of using sharding in MongoDB?
+   - **Answer:** 
+     - Increase storage capacity
+     - Increase read/write throughput
 167) ________
    - **Answer:** AAAAAnswr
 168) ________
