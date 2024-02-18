@@ -1239,8 +1239,13 @@ Data Modeling - process of defining how data is stored and relationships that ex
    - **Answer:** Stop the mongod process, replace the SSL/TLS certificates on the server, and then restart the mongod process using the `--tlsCAFile` option to specify the location of the new CA certificate. 
 116) Which of the following best describes the purpose of the "queryPlanner" stage in a MongoDB query plan?
    - **Answer:** It generates a list of candidate query plans and calculates the cost of each plan.
-117) When should you use the `mongos` process in MongoDB server administration?
-   - **Answer:** When you want to connect to a replica set in a sharded cluster.
+117) How to manage Databases, Collections, and Documents in Atlas Data Explorer?
+   - **Answer:** 
+     - From the left panel in Atlas Data Explorer, click "Databases."
+     - Click "Browse Collections."
+     - Click "Create Database."
+     - Enter a database name and a collection name, and then click the Create button.
+     - To insert a document, select the collection where you want to insert it and then click "Insert Document."
 118) How to configure MongoDB to enforce authentication by adding the correct configuration file option
    - **Answer:** `net: authorization: enabled`
 119) When should you use the `mongos` process in MongoDB server administration?
@@ -1342,11 +1347,11 @@ Data Modeling - process of defining how data is stored and relationships that ex
        security:
          keyFile: /var/mongodb/pki/node1/keyfile
 ```
-160) Which method should you use to reconfigure a replica set by applying a new replica set configuration?
+1)   Which method should you use to reconfigure a replica set by applying a new replica set configuration?
    - **Answer:** `rs.reconfig()`
-161) How is data distributed across shards in a sharded MongoDB cluster?
+2)   How is data distributed across shards in a sharded MongoDB cluster?
    - **Answer:** By hashed index
-162) Configuration that you should choose for your production MongoDB cluster to ensure that your systems are highly available.
+3)   Configuration that you should choose for your production MongoDB cluster to ensure that your systems are highly available.
    - **Answer:** 
 ```
 - deploy config servers as a 3 member replica set
@@ -1359,16 +1364,204 @@ Data Modeling - process of defining how data is stored and relationships that ex
    - **Answer:** `rs.conf()`
 164) What operation is required before sharding a collection by running the `sh.shardCollection()` command in the mongo shell?
    - **Answer:** create an index on the shard key
-165) ____ ???
-   - **Answer:** AAAAAnswr
+165) What method from the config API allows you to set a configuration option in mongosh?
+   - **Answer:** E.g. `config.set('enableTelemetry', false)`
 166) Select advantages of using sharding in MongoDB?
    - **Answer:** 
      - Increase storage capacity
      - Increase read/write throughput
-167) ________
+167) What method is used to change databases within a script by using the load() method in mongosh?
+   - **Answer:** `db.getSiblingDB()`
+168) Which of the following statements describe a B tree?
+   - **Answer:** 
+     -  B trees sort the stored data in ascending sequential order from left to right
+     -  Nodes in a B tree can have more than two child nodes
+     -  A B tree is a self-balancing tree data structure
+169) What arguments `.explain()` can have?
+   - **Answer:** 
+     - `queryPlanner` - default, it includes `queryPlan`, `winningPlan` and `rejectedPlans`
+     - `executionStats` shows how many documents were examined during query execution, also includes `queryPlanner` result
+     - `allPlansExecution` shows  `queryPlanner`, `executionStats` and all possible plans with related score
+170) Which of the following fields can help us determine the effectiveness of an index?
+   - **Answer:** 
+     - ` nReturned`
+     - ` totalDocsExamined`
+     - ` executionStages`
+     - ` totalKeysExamined`
+171) What will happen if `...find().sort()` operates with a data set bigger than 100MB?
+   - **Answer:** It will fail, to fix this should be use `...find().sort().allowDiskUse()`
+172) The SORT stage will be present in the executionStages object of the explain('executionStats') output if a blocking (in-memory) sort took place.
+   - **Answer:** The presence of the SORT stage in the executionStages object of the explain('executionStats') output means that MongoDB had to sort the documents in memory, which can be computationally expensive.
+173) How to make an wildcard index for polymorphic field `product_attributes`?
+   - **Answer:** `db.products.createIndex({ "product_attributes.$**" : 1 })`
+174) What benefits introduce wildcard index?
+   - **Answer:** Wildcard indexes can support queries against any field, even if that field is unknown at the time of querying
+175) How to create a partial index?
+   - **Answer:** 
+```
+db.zips.createIndex(
+  { state: 1 },
+  { partialFilterExpression: { pop: { $gte: 10000 } } }
+)
+```
+176)   How does a clustered index in MongoDB differ from a regular index?
+   - **Answer:** 
+     -  Clustered indexes arrange documents in order based on their index key.
+     -  Clustered indexes store the index key alongside the documents themselves.
+     -  Clustered index keys eliminate the need for an additional TTL (time to live) index.
+177)   What is the correct definition of a time series collection?
+   - **Answer:** Time series collections efficiently store time series data. In time series collections, writes are organized so that data from the same source is stored alongside other data points from a similar point in time.
+178)   What happens when the database profiler is enabled on a database?
+   - **Answer:** Operations are captured and recorded inside the database under a capped collection named system.profile
+179)   What will the following command return? `db.customers.aggregate([{ $indexStats: {} }]);`
+   - **Answer:**  An array of documents, each representing an index specification document.
+180)   What is the minimum privilege you need to download logs from an Atlas cluster?
+   - **Answer:** Project Data Access Read Only
+181)   Which of the following statements are true regarding the slowms property?
+   - **Answer:** 
+     - The slowms property defines the maximum amount of time for an operation to complete before it’s considered slow.
+     -  The default value for the slowms property is set to 100 milliseconds.
+182)   How to rotate logs for a self-managed mongod instance?
+   - **Answer:** 
+     - db.adminCommand( { logRotate : 1 } )
+     - sudo kill -SIGUSR1 $(pidof mongod)
+183)   In MongoDB, you are responsible for monitoring the health and performance of your database. Which of the following tools would be the most appropriate to use for real-time performance monitoring?
+   - **Answer:** MongoDB Ops Manager
+184)   How does WiredTiger handle index updates in MongoDB?
+   - **Answer:** By updating the index in place.
+185)   What set of commands do you need to run to set up a replica set and add 2 other nodes?
+   - **Answer:** `rs.initiate(); rs.add(node2); rs.add(node3);`
+186)   How to use wildcard index for whole collection? 
+   - **Answer:** 
+```sh
+db.products.createIndex(
+  { "$**": 1 },
+  { wildcardProjection: { _id: 1, stock: 0, prices: 1 } } # 0 to, exclude 1 to include
+)
+```
+187)   How to create compound index with wildcard?
+   - **Answer:** 
+```sh
+db.products.createIndex({
+  stock: 1,
+  "product_attributes.$**" : 1 # only one wildcard per compound is allowed
+})
+```
+188)   Characteristics of wildcard indexes?
+   - **Answer:** 
+     - Can be one or more per collection
+     - Different indexes can caver same field
+     - Cannot use TTL
+     - Cannot be unique 
+189)   Can `_id` be used as a partial index?
+   - **Answer:** No, because MongoDB uses it for its internal operations
+190)   Can sparse index be unique?
+   - **Answer:** Yes, but it doesn't apply to documents that omit the indexed field.
+191)   Explain what cluster index is?
+   - **Answer:** 
+     - A mechanism which makes the collection clustered
+       - Stores documents in cluster index order
+       - Stores clustered index key alongside the document
+     - Can only be created when cluster collection is built
+192) What benefits introduce cluster index?
+   - **Answer:** 
+     - Improve CRUD performance
+     - Reduces disk usage (because there is not additional BTree created like in non-cluster indexes)
+     - Reduces I/O (because data and index are stored together)
+     - Improves memory cache usage
+     - Improved TTL performance when configured as a TTL index 
+193)   What limitations has cluster index?
+   - **Answer:** 
+     - Can be created only when clustered collection is created
+     - Only one cluster index per cluster collection
+     - Cluster index is not automatically used by `queryPlanner` when the secondary eligible index exists
+     - Can't be created on `caped` collection
+     - Cant' be hidden
+194)   What is time series collection?
+   - **Answer:** 
+     - Collection that is clustered base on time-series
+195)   What is time-series data?
+   - **Answer:** any kind of data that changes over time
+196)   Which are main 3 components that consist time-series?
+   - **Answer:** 
+     - Time 
+     - Metadata
+     - Measurements
+197)   How to create a time-series collection?
+   - **Answer:** 
+```js
+db.createCollection('weather', {
+   timeseries: {
+      timeField: 'timestamp', // required/ field of collection of type ISODate
+      metaField: 'metadata',
+      granularity: 'hours' // default is seconds
+   },
+});
+```
+198)   Can cluster index be used in combination with secondary index?
+   - **Answer:** Yes, a good example os find by second index together with sorting based on cluster index
+199)   ________
    - **Answer:** AAAAAnswr
-168) ________
+200)   ________
    - **Answer:** AAAAAnswr
+201)   ________
+   - **Answer:** AAAAAnswr
+202)   ________
+   - **Answer:** AAAAAnswr
+203)   ________
+   - **Answer:** AAAAAnswr
+204)   ________
+   - **Answer:** AAAAAnswr
+205)   ________
+   - **Answer:** AAAAAnswr
+206)   ________
+   - **Answer:** AAAAAnswr
+207)   ________
+   - **Answer:** AAAAAnswr
+208)   ________
+   - **Answer:** AAAAAnswr
+209)   ________
+   - **Answer:** AAAAAnswr
+
+## Automating Log Rotation with the logrotate linux's Service
+
+1. Open `sudo vim /etc/mongod.conf` and add that:
+```
+...
+systemLog:
+  destination: file
+  logAppend: true
+  path: /var/log/mongodb/mongod.log
+  logRotate: reopen
+...
+```
+2. `sudo vim /etc/logrotate.d/mongod.conf`
+```
+/var/log/mongodb/mongod.log {
+   daily 
+   size 
+   rotate 10 
+   missingok
+   compress 
+   compresscmd /usr/bin/bzip2 
+   uncompresscmd /usr/bin/bunzip2 # command to uncompress the file
+   compressoptions -9 # options for the compression utility
+   compressext .bz2 # file format of the compressed archive
+   delaycompress # wait to compress files until it's an opportune time
+   notifempty # don't bother compressing if the log file is empty
+   create 640 mongodb mongodb # creates the log  file with specific permissions
+   sharedscripts # don't run multiple rotations at once
+   postrotate # tell mongod to rotate, remove empty files
+       /bin/kill -SIGUSR1 `cat /var/run/mongodb/mongod.pid 2>/dev/null` >/dev/null 2>&1
+       find /var/log/mongodb -type f -size 0 -regextype posix-awk -regex "^\/var\/log\/mongodb\/mongod\.log\.[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}-[0-9]{2}-[0-9]{2}$" -execdir rm {} \; >/dev/null 2>&1
+   endscript # end of the script
+}
+```
+3. `sudo systemctl restart mongod`
+4. __Testing the logrotate Configuration__
+   - `sudo tail -F /var/log/mongodb/mongod.log the mongod process:`
+   - `sudo kill -SIGUSR1 $(pidof mongod)`
+   - Notice the following line, indicating that the log was reopened `tail: /var/log/mongodb/mongod.log: file truncated;`
 
 
 ## Java
