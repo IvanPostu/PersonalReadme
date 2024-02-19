@@ -1347,11 +1347,11 @@ Data Modeling - process of defining how data is stored and relationships that ex
        security:
          keyFile: /var/mongodb/pki/node1/keyfile
 ```
-1)   Which method should you use to reconfigure a replica set by applying a new replica set configuration?
+161)   Which method should you use to reconfigure a replica set by applying a new replica set configuration?
    - **Answer:** `rs.reconfig()`
-2)   How is data distributed across shards in a sharded MongoDB cluster?
+162)   How is data distributed across shards in a sharded MongoDB cluster?
    - **Answer:** By hashed index
-3)   Configuration that you should choose for your production MongoDB cluster to ensure that your systems are highly available.
+163)   Configuration that you should choose for your production MongoDB cluster to ensure that your systems are highly available.
    - **Answer:** 
 ```
 - deploy config servers as a 3 member replica set
@@ -1500,27 +1500,176 @@ db.createCollection('weather', {
 ```
 198)   Can cluster index be used in combination with secondary index?
    - **Answer:** Yes, a good example os find by second index together with sorting based on cluster index
-199)   ________
-   - **Answer:** AAAAAnswr
-200)   ________
-   - **Answer:** AAAAAnswr
-201)   ________
-   - **Answer:** AAAAAnswr
-202)   ________
-   - **Answer:** AAAAAnswr
-203)   ________
-   - **Answer:** AAAAAnswr
-204)   ________
-   - **Answer:** AAAAAnswr
-205)   ________
-   - **Answer:** AAAAAnswr
-206)   ________
-   - **Answer:** AAAAAnswr
-207)   ________
-   - **Answer:** AAAAAnswr
-208)   ________
-   - **Answer:** AAAAAnswr
-209)   ________
+199)   What is MongoDB Database Tools suite? 
+   - **Answer:** 
+     -  MongoDB Database Tools are a suite of command-line utilities for working with MongoDB.
+     -  MongoDB Database Tools allow you to import and export data, restore backups, and view diagnostics for your deployments.
+     -  Version compatibility between MongoDB Database Tools and the target MongoDB server is crucial to ensure interoperability and data integrity. 
+200)   How does `mongodump` works?
+   - **Answer:** `mongodump <options> <connection-string>`
+     - **options:**
+       - `--out` - directory where to dump
+       - `--db` - to chose a single db instead of entire cluster
+       - `--collection`
+       - `--readPreference`
+       - `--gzip`
+       - `--archive`
+       - `--oplog` 
+         - works only on entire cluster, not compatible with `--db` and `--collection`
+         - fails if there is collection rename or an aggregation with `$out` option
+201)   In which situations can be used `mongodump` for backup/restore?
+   - **Answer:** For small non-clustered database
+202)   What should be used for production quality backup/recovery?
+   - **Answer:** 
+     - MongoDB Atlas
+     - MongoDB Cloud Manager
+     - MongoDB Ops Manager
+203)   Does `mongodump` keep indexes?
+   - **Answer:** No
+204)   Is the example of `mongodump` command correct?
+   - **Answer:** Yes,
+```sh
+$ mongodump \
+   -v \ # for verbosity
+   --gzip \
+   --archive=backup.gz \
+   "connection_string"
+```
+205)   Where does mongodump put dump file by default?
+   - **Answer:** Inside `dump` folder in the current working directory
+206)   Which of the following commands will back up only the `grades` collection from the `sample_training` database in a dump directory?
+   - **Answer:** 
+     - `mongodump --db sample_training --collection grades `
+     - `mongodump --collection grades "mongodb+srv://dbaTestAdmin@m0-example-cluster.iy0a1o4.mongodb.net/sample_training"` **only in case of Atlas Cluster**
+207)   What should be taken into consideration when `mongorestore` is used?
+   - **Answer:** 
+     - Version compatibility between source and target cluster
+     - Version compatibility between `mongodump` and `mongorestore` cluster
+     - Handles network partition poorly
+     - Limited support for point-in-time restores
+208)   How `mongorestore` works?
+   - **Answer:** 
+     - Does not update matching documents but does insert new ones
+     - Does not restore `system.profile`
+     - Can trigger index builds (time consuming)
+209)   What is the syntax of `mongorestore`? 
+   - **Answer:** `mongorestore <options> <connection_string> <directory-or-file-to-restore-from>`
+210)   Enumerate `mongorestore` options
+   - **Answer:** 
+     - `--nsInclude` - indicates what collections to include/exclude during the restore process
+     - `--nsExclude` - indicates what collections to include/exclude during the restore process
+     - `--drop` - removes collections if exists and create empty ones and then upload data, restored documents will get new `_id`
+     - `--noIndexRestore`
+     - `--writeConcern` - default is `majority`
+     - `--gzip` - only if source data is compressed
+     - `--archive` - to use a single file instead of directory
+     - `--oplogReplay`
+211)   Example of mongorestore command
+   - **Answer:** 
+```sh
+mongorestore \ 
+   -v \
+   --gzip \
+   --archive=backup.gz \
+   --drop \
+   "connection_string"
+```
+212)   What does the next command `mongorestore --nsInclude=sample_training.grades dump/`?
+   - **Answer:** It will restore only the grades collection from the `sample_training` database from a `dump` directory
+213)   How to export data using `mongoexport` command?
+   - **Answer:** 
+```sh
+mongoexport \
+   -v \
+   --collection transaction \
+   --query '{ "transaction_count": {$gte: 50} }'
+   --out export.json \
+   --jsonFormat canonical \
+   "connection_string"
+```
+214) How to import data using `mongoimport` command?
+   - **Answer:** 
+```sh
+mongoimport \
+   -v \
+   --collection newCollection \
+   --type json \
+   --mode insert \
+   --drop \
+   --file export.json \
+   "connection_string"
+```
+215)   What does `mongostat` do?
+   - **Answer:** Collect realtime statistics about the cluster
+```sh
+$ mongostat -h 'localhost:27017' -u root --authenticationDatabase admin
+
+insert query update delete getmore command dirty used flushes vsize   res qrw arw net_in net_out conn                time
+    *0    *0     *0     *0       0     0|0  0.0% 0.0%       0 1.44G 84.0M 0|0 0|0   111b   49.8k    3 Feb 18 18:07:47.463
+    *0    *0     *0     *0       0     0|0  0.0% 0.0%       0 1.44G 84.0M 0|0 0|0   111b   49.9k    3 Feb 18 18:07:48.463
+    *0    *0     *0     *0       0     1|0  0.0% 0.0%       0 1.44G 84.0M 0|0 0|0   112b   50.0k    3 Feb 18 18:07:49.462
+```
+216)   What does `mongostat -o='insert=new_col_name'` do?
+   - **Answer:** It show only insert column with the new alias for it.
+217)   What does the next command do?
+   - `mongostat -o='host,opcounters.insert.rate()=Insert Rate,opcounters.query.rate()=Query Rate,opcounters.command.rate()=Command Rate' --rowcount=3 -h 'localhost:27017' -u root --authenticationDatabase admin`
+   - **Answer:** Shows the next 3 records of diagnostic:
+```
+host                       Insert Rate Query Rate Command Rate
+localhost:27017           0          0            0
+localhost:27017           0          0            1
+localhost:27017           0          0            1
+
+```
+218)   Write an example of `mongotop` command!
+   - **Answer:** 
+```
+$ mongotop “mongodb+srv://dbaTestAdmin@cluster0.mntqoh9.mongodb.net” 2 --rowcount=3
+
+                    ns    total    read    write    2024-02-18T18:29:03Z
+    admin.system.roles      0ms     0ms      0ms                        
+    admin.system.users      0ms     0ms      0ms                        
+  admin.system.version      0ms     0ms      0ms                        
+config.system.sessions      0ms     0ms      0ms                        
+   config.transactions      0ms     0ms      0ms                        
+  local.system.replset      0ms     0ms      0ms   
+```
+219)   Which of the following commands will show the read and write activity of ar MongoDB instance at `mongodb+srv://username@businesscluster.iy0a1o4.mongodb.net` every 30 seconds?
+   - **Answer:** mongotop 30 --uri='mongodb+srv://username@businesscluster.iy0a1o4.mongodb.net' 
+220)   Which of the following best describes the MongoDB Database Tool `mongotop`?
+   - **Answer:** `mongotop` provides a method to track the amount of time a MongoDB instance spends reading and writing data
+221)   What is `bsondump`? 
+   - **Answer:** cli converter of BSON files to JSON or any other human readable format
+222)   Give an example of `bsondump` command
+   - **Answer:** 
+```sh
+bsondump \
+   --pretty \
+   --type=debug \
+   dump/sample_analytics/accounts.bson
+```
+223)   Command which will output a prettified JSON file from the grades.bson file?
+   - **Answer:** `bsondump --outFile=grades.json -–pretty grades.bson`
+224)   How to upload a file to GridFS?
+   - **Answer:** `mongofiles -v put test.txt --host 'localhost' --port 27017  --db my_db -u test1`
+225)   What is GridFS?
+   - **Answer:** A specification for storing files in mongodb
+226)   WHat is `mongofiles`?
+   - **Answer:** A cli tool which provide an interface between local filesystem and GridFS
+227)   Who does GridFS works?
+   - **Answer:** It creates 2 collections `fs.chunks` and `fs.files`.
+     - In `fs.files` it stores file metadata like name, size, created date
+     - In `fs.chunks` it stores binary chunks for that file, each chunk has a size of 255Kb and a reference to related `fs.files` document.
+228)   What commands supports `mongofiles` clie tool?
+   - **Answer:** 
+     - `--list`
+     - `--search`
+     - `--get`
+     - `--put`
+     - `--delete`
+229)   Which of the following commands will list all of the files in the GridFS collection in the grades database that start with the word "final"?
+   - **Answer:** `mongofiles -d=grades list final `
+230)   ________
    - **Answer:** AAAAAnswr
 
 ## Automating Log Rotation with the logrotate linux's Service
