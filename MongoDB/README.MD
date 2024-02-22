@@ -1669,8 +1669,226 @@ bsondump \
      - `--delete`
 229)   Which of the following commands will list all of the files in the GridFS collection in the grades database that start with the word "final"?
    - **Answer:** `mongofiles -d=grades list final `
-230)   ________
+230)   How to Start, Stop, and Check the Status of mongod?
+   - **Answer:** 
+     - `sudo systemctl start mongod`
+     - `sudo systemctl status mongod`
+     - `sudo systemctl stop mongod`
+231)   What is `mongod`?
+   - **Answer:**  `mongod` is the primary daemon process for the MongoDB system.
+232)   How to change `/etc/mongod.conf` and to apply changes?
+   - **Answer:** 
+     - `sudo nano /etc/mongod.conf`
+     - `sudo ss -ltp | grep mongo`
+     - `sudo systemctl restart -l mongod`
+233)   You want to create your first database user. What database should you create the first database user on?
+   - **Answer:** ` admin` - The localhost exception allows you to enable access control and then create only the first user or role in the system on the admin database. Once the first user is created, the localhost exception is disabled, so it’s important that this user has privileges to create other users.
+234)   How to identify the log path for mongodb logs?
+   - **Answer:** `db.serverCmdLineOpts().parsed.systemLog.path`
+235)   How to access Logs in mongosh?
+   - **Answer:** `show logs`, `show log <type>`, `show log global`
+236)   Which are considered core metrics for MongoDB deployment?
+   - **Answer:** 
+     - Query Targeting (how many documents were scanned and how many returned, the ideal value is 1, but if were scaned 100 and returned 1 then it is a problem)
+     - Storage
+       - Disk space percent free
+       - Disk IOPS
+       - Disk Queue Depth
+       - Disk Latency
+     - CPU utilization
+     - Memory utilization
+     - Replication lag
+237)   Which of the following is the ideal value for objects scanned when reviewing the Query Targeting metrics?
+   - **Answer:** 1
+238)   You need to check if the storage subsystem has become a bottleneck. Which of the following storage metrics will help you determine if operations are waiting to be serviced?
+   - **Answer:**  Disk Queue Depth 
+239)   Which are metrics that are less important but also required?
+   - **Answer:** 
+     - Opcounters - operations run per second on a mongodb deployment
+     - Network Traffic
+     - Connections - opened to the db
+     - Tickets Available - concurrent read and write operations available to the db storage.
+240)   Which of the following metrics allows you to view the rate at which different types of operations are being performed within your deployment?
+   - **Answer:** Opcounters
+241)   Which of the following metrics should you watch if you wish to monitor network traffic for your deployment?
+   - **Answer:** 
+     -  bytesIn
+     -   bytesOut
+     -   numRequests
+242)   You are creating new alerts for an M5 (shared-tier) cluster and you successfully configure an alert for a Query Targeting metric. However, you notice that the alert isn’t being triggered, even though several queries are exceeding the threshold you set. Which of the following explains why the new alert isn’t being triggered?
+   - **Answer:**  The Query Target alert condition will not trigger an alert for an M5 cluster
+243)   You have been granted the clusterAdmin role, will you be able to configure new alert conditions for a specific host?
+   - **Answer:** No, the Project Owner role is required to configure any new alerts for a specific host.
+244)   You receive a notification from Atlas that an alert has been triggered for your project and you wish to acknowledge the alert with the Atlas CLI. What information is required to successfully acknowledge the alert with the atlas alerts acknowledge command?
+   - **Answer:** The atlas alerts acknowledge command requires `id` to successfully acknowledge an alert
+245)   Under which of the following circumstances will an Atlas alert’s status change to CLOSED?
+   - **Answer:**  When the alert condition is resolved
+246)   MongoDB Atlas gathers active operation metrics from the database instance using which of the following commands?
+   - **Answer:**  currentOp
+247)  You wish to view the total number of active connections to your deployment while in the MongoDB Shell. Which of the following commands should you use?
+   - **Answer:**  serverStatus
+248)   ________
    - **Answer:** AAAAAnswr
+249)   ________
+   - **Answer:** AAAAAnswr
+250)   ________
+   - **Answer:** AAAAAnswr
+250)   ________
+   - **Answer:** AAAAAnswr
+250)   ________
+   - **Answer:** AAAAAnswr
+250)   ________
+   - **Answer:** AAAAAnswr
+250)   ________
+   - **Answer:** AAAAAnswr
+250)   ________
+   - **Answer:** AAAAAnswr
+250)   ________
+   - **Answer:** AAAAAnswr
+250)   ________
+   - **Answer:** AAAAAnswr
+250)   ________
+   - **Answer:** AAAAAnswr
+250)   ________
+   - **Answer:** AAAAAnswr
+250)   ________
+   - **Answer:** AAAAAnswr
+250)   ________
+   - **Answer:** AAAAAnswr
+250)   ________
+   - **Answer:** AAAAAnswr
+250)   ________
+   - **Answer:** AAAAAnswr
+250)   ________
+   - **Answer:** AAAAAnswr
+250)   ________
+   - **Answer:** AAAAAnswr
+250)   ________
+   - **Answer:** AAAAAnswr
+250)   ________
+   - **Answer:** AAAAAnswr
+
+## Monitoring using Precona MongoDB Exporter, Prometheus and Grafana
+
+### Install Percona MongoDB Exporter on Ubuntu Linux
+```sh
+$ wget
+https://github.com/percona/mongodb_exporter/releases/download/v0.39.0/mongodb_exporter-0.39.0.linux-amd64.tar.gz
+$ tar xvzf mongodb_exporter-0.39.0.linux-amd64.tar.gz
+$ sudo mv mongodb_exporter-0.39.0.linux-amd64/mongodb_exporter /usr/local/bin/
+```
+
+### Create a Percona user for MongoDB
+```sh
+mongosh
+
+use admin
+
+db.createUser({user: "test",pwd: "testing",roles: [{ role: "clusterMonitor", db: "admin" },{ role: "read", db: "local" }]})
+```
+
+## Create a Service for Percona MongoDB Exporter
+```sh
+$ sudo nano /lib/systemd/system/mongodb_exporter.service # Create a new service file for the mongodb_exporter
+
+# [Unit]
+# Description=MongoDB Exporter
+# User=prometheus
+# 
+# [Service]
+# Type=simple
+# Restart=always
+# ExecStart=/usr/local/bin/mongodb_exporter \
+# --collect-all \
+# --mongodb.uri=mongodb://test:testing@localhost:27017
+# 
+# [Install]
+# WantedBy=multi-user.target
+
+$ sudo systemctl daemon-reload
+$ sudo systemctl start mongodb_exporter
+$ sudo systemctl enable mongodb_exporter # to start automatically on boot
+$ sudo systemctl status --full mongodb_exporter
+$ curl http://localhost:9216/metrics  # Confirm that MongoDB metrics are being collected and available via the mongodb_exporter /metrics endpoint
+
+```
+
+### Install Prometheus on ubuntu linux
+```sh
+$ sudo apt update
+$ sudo apt install --yes prometheus
+$ sudo systemctl status --full prometheus
+$ curl http://localhost:9090/-/ready # check that the service is ready
+```
+
+### Edit the Prometheus Configuration File
+```sh
+$ sudo nano /etc/prometheus/prometheus.yml
+#...
+# scrape_configs:
+# ...
+#   - job_name: 'mongodb_exporter'
+#     static_configs:
+#       - targets: ['localhost:9216']
+#...
+
+$ sudo systemctl restart prometheus
+$ curl http://localhost:9090/api/v1/targets | jq --raw-output '.data.activeTargets[] | .scrapeUrl + " " + .health' # Use the Prometheus server API to confirm that the local MongoDB exporter target is present and healthy
+```
+
+### Install Grafana on Ubuntu Linux
+```sh
+$ sudo apt-get install --yes apt-transport-https software-properties-common wget
+$ sudo wget -q -O /usr/share/keyrings/grafana.key https://apt.grafana.com/gpg.key
+$ echo "deb [signed-by=/usr/share/keyrings/grafana.key] https://apt.grafana.com stable main" | sudo tee -a /etc/apt/sources.list.d/grafana.list
+$ sudo apt update
+$ sudo apt install --yes grafana
+```
+
+### Start Grafana as a Service
+```sh
+$ sudo systemctl start grafana-server
+$ sudo systemctl enable grafana-server
+$ sudo systemctl status --full grafana-server
+$ curl http://localhost:3000/api/health
+```
+
+### Add Prometheus to the Grafana Server
+```sh
+curl \
+  --header 'Content-Type: application/json' \
+  --user 'admin:admin' \
+  --request 'POST' \
+  --data '{"name": "Prometheus", "type": "prometheus", "url": "http://localhost:9090", "access": "proxy"}' \
+  http://localhost:3000/api/datasources
+```
+
+## Command Line Metrics
+```sh
+db.runCommand(
+   {
+     serverStatus: 1
+   }
+);
+
+db.runCommand( { serverStatus: 1 } ).connections;
+
+db.adminCommand(
+   {
+     currentOp: true,
+     "$all": true
+   }
+);
+
+db.adminCommand(
+   {
+     killOp: 1,
+     op: <opid>,
+     comment: <any>
+   }
+);
+```
+
 
 ## Automating Log Rotation with the logrotate linux's Service
 
@@ -2029,11 +2247,46 @@ public class MongoDemoApplication implements CommandLineRunner {
 
 ## Exercise 1 
 - Create a DB and 2 collections, insert 2 records and update 1 through MongoDB-Atlas
-<img src="./forReadme/mongo1.png" alt="Image Description" >
+<img src="./forReadme/mongo1.png" />
 
 ## Exercise 2 
 - Connect to local MongoDB using Compass GUI with connection string: `mongodb://root:root@localhost:27017/admin`
-<img src="./forReadme/mongo3.png" alt="Image Description" >
+<img src="./forReadme/mongo3.png" />
+
+## Exercise 3
+- Create the first admin database user
+```sh
+$ sudo systemctl start mongod
+
+$ mongosh
+
+use admin
+db.createUser(
+  {
+    user: "dbaTestAdmin",
+    pwd: "dbaTestPassword", # or passwordPrompt()
+    roles: [ { role: 'root', db: 'admin' } ]
+  }
+)
+show users
+db.adminCommand(
+   {
+      createUser: "dbaTestAdmin",
+      pwd: "dbaTestPassword",
+      roles: [
+      { role: "userAdminAnyDatabase", db: "admin" }
+      ]
+   }
+)
+# to stop mongod service
+db.adminCommand( { shutdown: 1 } )
+
+```
+
+## Exercise 4
+- First localhost session has all roles, but it should create one admin user and to perform for its name, because localhost usor after that won't have priveledges
+<img src="./forReadme/mongo4.png" />
+
 
 # References:
 - https://www.mongodb.com/docs/drivers/
