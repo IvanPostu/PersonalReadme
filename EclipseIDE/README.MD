@@ -15,6 +15,7 @@
     - <img src="./forReadme/img4.png" />
     - Evaluate expression: 
       - <img src="./forReadme/img5.png" />
+    - <img src="./forReadme/img6.png" />
     - <img src="./forReadme/img7.png" />
 
 ## Use specific JDK
