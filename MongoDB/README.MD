@@ -1727,45 +1727,48 @@ bsondump \
    - **Answer:**  currentOp
 247)  You wish to view the total number of active connections to your deployment while in the MongoDB Shell. Which of the following commands should you use?
    - **Answer:**  serverStatus
-248)   ________
+248)   A business has determined it can tolerate the database being down for no more than one hour. What is this value called?
+   - **Answer:**  Recovery Time Objective
+249)   A business has determined that it can tolerate losing four hours of data. What is this value called?
+   - **Answer:**  Recovery Point Objective
+250)   Which of the following are key elements of a backup plan?
+   - **Answer:** 
+     - How to back up the data
+     - How often the data needs to be backed up
+     - How long to retain the backup data
+251)   Before you create a snapshot, you need to lock your MongoDB deployment
+   - **Answer:** True, You need to lock your MongoDB deployment by using the db.fsyncLock() command. This prevents additional write operations while creating the snapshot. After creating the snapshot, remember to unlock your deployment by using the db.fsyncUnlock() command.
+252)   You want to create a complete copy of your data at a specific point in time. How can you accomplish this?
+   - **Answer:**  Create a snapshot of your data
+253)   Which Linux command can be used to restore an archived volume snapshot?
+   - **Answer:** `dd`
+254)   Volume snapshots should be stored separately from the MongoDB deployment.
+   - **Answer:** True, It’s a good idea to store your backups on a separate server from the MongoDB deployment. This allows you to easily access your backups in case your MongoDB deployment server becomes unavailable. It also allows you to save server resources for your deployment server.
+255)   1
    - **Answer:** AAAAAnswr
-249)   ________
+256)   ________
    - **Answer:** AAAAAnswr
-250)   ________
+257)   ________
    - **Answer:** AAAAAnswr
-250)   ________
+258)   ________
    - **Answer:** AAAAAnswr
-250)   ________
+259)   ________
    - **Answer:** AAAAAnswr
-250)   ________
+260)   ________
    - **Answer:** AAAAAnswr
-250)   ________
+261)   ________
    - **Answer:** AAAAAnswr
-250)   ________
+262)   ________
    - **Answer:** AAAAAnswr
-250)   ________
+263)   ________
    - **Answer:** AAAAAnswr
-250)   ________
+264)   ________
    - **Answer:** AAAAAnswr
-250)   ________
+265)   ________
    - **Answer:** AAAAAnswr
-250)   ________
+266)   ________
    - **Answer:** AAAAAnswr
-250)   ________
-   - **Answer:** AAAAAnswr
-250)   ________
-   - **Answer:** AAAAAnswr
-250)   ________
-   - **Answer:** AAAAAnswr
-250)   ________
-   - **Answer:** AAAAAnswr
-250)   ________
-   - **Answer:** AAAAAnswr
-250)   ________
-   - **Answer:** AAAAAnswr
-250)   ________
-   - **Answer:** AAAAAnswr
-250)   ________
+267)   ________
    - **Answer:** AAAAAnswr
 
 ## Monitoring using Precona MongoDB Exporter, Prometheus and Grafana
@@ -1929,6 +1932,108 @@ systemLog:
    - `sudo tail -F /var/log/mongodb/mongod.log the mongod process:`
    - `sudo kill -SIGUSR1 $(pidof mongod)`
    - Notice the following line, indicating that the log was reopened `tail: /var/log/mongodb/mongod.log: file truncated;`
+
+## Filesystem Snapshot Volumes on a MongoDB Server - dd tool
+
+### Lock the Database
+```sh
+mongosh
+
+db.fsyncLock();
+
+exit
+```
+
+### Create a Snapshot Volume
+```sh
+sudo lvcreate --size 100M --snapshot --name mdb-snapshot /dev/vg0/mdb;
+```
+
+### Unlock the Database
+```sh
+mongosh
+
+db.fsyncUnlock();
+```
+
+### Archive the Snapshot
+```sh
+exit
+
+sudo dd status=progress if=/dev/vg0/mdb-snapshot | gzip > mdb-snapshot.gz
+```
+
+### Restore the Archived Snapshot
+```sh
+$ sudo lvcreate --size 1G --name mdb-new vg0;
+
+$ gzip -d -c mdb-snapshot.gz | sudo dd status=progress of=/dev/vg0/mdb-new
+
+$ sudo systemctl stop -l mongod; sudo systemctl status -l mongod;
+
+$ sudo rm -r /var/lib/mongodb/*
+
+$ sudo umount /var/lib/mongodb
+
+$ sudo mount /dev/vg0/mdb-new /var/lib/mongodb
+
+$ sudo systemctl start -l mongod; sudo systemctl status -l mongod;
+
+$ mongosh
+
+$ show dbs
+```
+## Filesystem Archives on a MongoDB Server - tar
+### Lock the Database
+```sh
+mongosh
+
+db.fsyncLock();
+
+exit
+```
+
+### Create a Snapshot Volume
+`sudo lvcreate --size 100M --snapshot --name mdb-snapshot /dev/vg0/mdb;`
+
+### Unlock the Database
+```sh
+mongosh
+
+db.fsyncUnlock();
+
+# mount the snapshot volume taken previously as read-only on the directory that you just created:
+sudo mount -t xfs -o nouuid,ro /dev/vg0/mdb-snapshot /tmp/mongodbsnap/
+
+# use tar to create a new archive of all the files in the mongodbsnap directory
+sudo tar -czvf mdb-snapshot.tar.gz -C /tmp/mongodbsnap/ .
+```
+
+### Restore the Archived Snapshot
+```sh
+sudo mkdir /mdb
+
+sudo tar -xzf mdb-snapshot.tar.gz -C /mdb
+
+# Then stop the MongoDB service before updating the dbPath in the MongoDB configuration file. Then, make the mongodb user and group the owner of the mdb directory and all of its files. Otherwise, the service will fail to start.
+sudo systemctl stop -l mongod; sudo systemctl status -l mongod;
+
+sudo chown -R mongodb:mongodb /mdb
+
+# Next, open the mongod.conf file and change the dbPath to /mdb
+sudo nano /etc/mongod.conf
+
+storage:
+  dbPath: /mdb
+
+# Start the MongoDB service and connect to the deployment. Then run show dbs to confirm that the databases have been restored:
+sudo systemctl start -l mongod; sudo systemctl status -l mongod;
+
+mongosh
+
+show dbs
+```
+
 
 
 ## Java
