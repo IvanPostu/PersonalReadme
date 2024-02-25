@@ -20,8 +20,16 @@
     - <img src="./forReadme/img8.png" />
     - <img src="./forReadme/img9.png" />
     - <img src="./forReadme/img10.png" />
+    - <img src="./forReadme/img11.png" />
+    - <img src="./forReadme/img12.png" />
+    - <img src="./forReadme/img13.png" />
 
 ## Use specific JDK
 - <img src="./forReadme/img11.png" />
 
+## Checkstyle plugin
+- <img src="./forReadme/cs1.png" />
+- <img src="./forReadme/cs2.png" />
 
+- https://www.baeldung.com/checkstyle-java
+- https://stackoverflow.com/questions/57073005/failed-during-checkstyle-configuration-unable-to-parse-configuration-stream
