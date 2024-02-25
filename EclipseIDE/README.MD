@@ -23,6 +23,7 @@
     - <img src="./forReadme/img11.png" />
     - <img src="./forReadme/img12.png" />
     - <img src="./forReadme/img13.png" />
+    - <img src="./forReadme/img14.png" />
 
 ## Use specific JDK
 - <img src="./forReadme/img11.png" />
