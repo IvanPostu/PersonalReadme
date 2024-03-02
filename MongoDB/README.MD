@@ -1744,31 +1744,90 @@ bsondump \
    - **Answer:** `dd`
 254)   Volume snapshots should be stored separately from the MongoDB deployment.
    - **Answer:** True, It’s a good idea to store your backups on a separate server from the MongoDB deployment. This allows you to easily access your backups in case your MongoDB deployment server becomes unavailable. It also allows you to save server resources for your deployment server.
-255)   1
+255) You want to add a new index to your replica set. Which type of environment should you test in before releasing to users?
+   - **Answer:** Pre-production
+256)   Which of the following can result in rolling maintenance?
+   - **Answer:** 
+     - Creating a new index
+     - Upgrading the MongoDB version
+     - Upgrading the operating system
+257)   Which of the following is true about MongoDB maintenance?
+   - **Answer:** Nodes can be updated individually while the others continue running. 
+258)   You want to upgrade your MongoDB driver. What action should you take before doing so?
+   - **Answer:**  Check the compatibility between the driver and MongoDB version
+259) Which characteristics affect the proper functioning of an application?
+   - **Answer:** 
+     - Performance improvements
+     - Regressions in driver upgrades
+260)   You want to upgrade your MongoDB database version to 6.0 for your three-member replica set. Which of the following should you do before upgrading?
+   - **Answer:** 
+     - Confirm that MongoDB version 5.0 is installed (You must install versions in consecutive order. For example, if you are running 4.4, you must first upgrade to 5.0 before upgrading to 6.0.)
+     - Create a pre-production environment for your application that uses the updated version
+     - Confirm the feature compatibility version of each member (Before upgrading, you should confirm that each member of the replica set has the same feature compatibility version. The feature compatibility version enables or disables the features that persist data and are incompatible with earlier versions of MongoDB.)
+     - Confirm the state of each member. Before upgrading, ensure that no replica set member is in the ROLLBACK or RECOVERING state. If it’s not clear what the state of the member is, the risk of corrupting or losing data rises significantly.
+261)   You have completed your pre-upgrade checklist and are ready to upgrade. What should you do first?
+   - **Answer:** Gracefully shut down the first secondary member that you plan to upgrade
+262)   You have an Atlas cluster and need to grant specific users access to specific projects. Where can you do this in Atlas?
+   - **Answer:** Organizations tab.
+263)   You want to retrieve the status of your oplog, including details such as the configured size of your oplog and the first recorded event time. Which command should you use?
+   - **Answer:** `rs.printReplicationInfo()`
+264)   Which of the following are causes of replication lag?
+   - **Answer:** 
+     - `Network latency`
+     - `Disk throughput`
+     - `Write concerns`
+265)   You want data to be read only from your secondary nodes. How do you achieve this?
+   - **Answer:**  Set the read preference to secondary.
+266)   What is the difference between read concern and read preference?
+   - **Answer:** 
+     - concern - is specified in read/write query
+     - preference - is specified in connection string of server config. 
+       - `primary`, `secondary`, `primaryPreferred`, `secondaryPreferred`
+267)   You want to update the primary node of a replica set. How do you initiate an election?
+   - **Answer:** `rs.stepDown()`
+268)   Which of the following commands initiates a replica set?
+   - **Answer:** `rs.initiate()`
+269)   ________
    - **Answer:** AAAAAnswr
-256)   ________
+270)   ________
    - **Answer:** AAAAAnswr
-257)   ________
+271)   ________
    - **Answer:** AAAAAnswr
-258)   ________
+272)   ________
    - **Answer:** AAAAAnswr
-259)   ________
+273)   ________
    - **Answer:** AAAAAnswr
-260)   ________
+274)   ________
    - **Answer:** AAAAAnswr
-261)   ________
+275)   ________
    - **Answer:** AAAAAnswr
-262)   ________
+276)   ________
    - **Answer:** AAAAAnswr
-263)   ________
+277)   ________
    - **Answer:** AAAAAnswr
-264)   ________
+278)   ________
    - **Answer:** AAAAAnswr
-265)   ________
+279)   ________
    - **Answer:** AAAAAnswr
-266)   ________
+280)   ________
    - **Answer:** AAAAAnswr
-267)   ________
+281)   ________
+   - **Answer:** AAAAAnswr
+282)   ________
+   - **Answer:** AAAAAnswr
+283)   ________
+   - **Answer:** AAAAAnswr
+284)   ________
+   - **Answer:** AAAAAnswr
+285)   ________
+   - **Answer:** AAAAAnswr
+286)   ________
+   - **Answer:** AAAAAnswr
+287)   ________
+   - **Answer:** AAAAAnswr
+288)   ________
+   - **Answer:** AAAAAnswr
+289)   ________
    - **Answer:** AAAAAnswr
 
 ## Monitoring using Precona MongoDB Exporter, Prometheus and Grafana
@@ -2033,6 +2092,26 @@ mongosh
 
 show dbs
 ```
+
+
+### Specify the Write Concern on an Individual Operation
+```sh
+db.cats.insertOne({ name: "Mac", color: "black", age: 6 }, { writeConcern:
+{ w: "majority" , wtimeout: 3000 } }); # 3000 milliseconds
+```
+
+### Set the Default Read and Write Concerns
+```sh
+db.adminCommand({
+    setDefaultRWConcern : 1,
+    defaultReadConcern: { level : "majority" },
+    defaultWriteConcern: { w: "majority" }
+  })
+```
+
+### Set the Read Preference in connection string
+`mongodb://db0.example.com,db1.example.com,db2.example.com/?replicaSet=myRepl&readPreference=secondary&maxStalenessSeconds=120`
+
 
 
 
@@ -2391,6 +2470,41 @@ db.adminCommand( { shutdown: 1 } )
 ## Exercise 4
 - First localhost session has all roles, but it should create one admin user and to perform for its name, because localhost usor after that won't have priveledges
 <img src="./forReadme/mongo4.png" />
+
+## Exercise 5 Replica set
+<img src="./forReadme/mongo5.png" />
+<img src="./forReadme/mongo6.png" />
+
+Restart each mongod service `sudo systemctl restart mongod`
+
+Check db status `sudo systemctl status mongod`
+
+In `mongosh`:
+<img src="./forReadme/mongo7.png" />
+<img src="./forReadme/mongo8.png" />
+
+Connect to the replica set
+<img src="./forReadme/mongo9.png" />
+
+Run:
+- `rs.status()`
+- `rs.stepDown()` to make current PRIMARY as a SECONDARY
+- `rs.status()` show that the new node is PRIMARY
+---
+
+The command `db.hello()` to show the status of the current mongod instance
+<img src="./forReadme/mongo10.png" />
+
+The command `rs.conf()`
+<img src="./forReadme/mongo11.png" />
+
+The command to change the config, to not forget to run `rs.reconfig(config)`
+<img src="./forReadme/mongo12.png" />
+
+Replacing replica set member, to not forget to run `rs.reconfig(config)`
+<img src="./forReadme/mongo13.png" />
+
+To show the status of the replica set run: `rs.status()`
 
 
 # References:
