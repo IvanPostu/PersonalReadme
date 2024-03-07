@@ -1311,7 +1311,7 @@ Data Modeling - process of defining how data is stored and relationships that ex
    - **Answer:** The config database is used to store information about shards in shared MongoDB cluster. 
 147) What role does the `mongos` process play in a MongoDB sharded cluster, and how does it ensure data consistency between shards?
    - **Answer:** The `mongos` process is responsible for routing both read and write operations to the appropriate shards in the cluster, and it ensures data consistency between shards by using a distributed lock mechanism.
-148) Indexes on a field with values of varying data types
+148) How does indexes work for values of varying data types?
    - **Answer:** Values are ordered by data type, then by value.
 149) What is an arbiter in replica set?
    - **Answer:** Special type of replica set member. An arbiter doesn't have a copy of the data set and can't become a primary but it participates in elections for primary.
@@ -1787,47 +1787,132 @@ bsondump \
    - **Answer:** `rs.stepDown()`
 268)   Which of the following commands initiates a replica set?
    - **Answer:** `rs.initiate()`
-269)   ________
+269)   What is the purpose of auditing in the context of database security?
+   - **Answer:** 
+     -  Support the analysis of security incidents
+     -  Comply with regulatory requirements
+270)   What is localhost exception?
+   - **Answer:** A mechanism which allow to connect to the localhost interface of mongodb in case there isn't any users and roles, it means that the first user should be created for admin database and should have `userAdminAnyDatabase` role
+271)   How to enter password securely in `mongosh` session?
+   - **Answer:** By using `passwordPrompt()`
+272)   How to Enable Access Control?
+   - **Answer:** Edit `/etc/mongod.conf` and add:
+      ``` 
+      #security:
+      security:
+         authorization: enabled
+      ```
+      save and `sudo systemctl restart mongod`
+273)   You assign a user the userAdminAnyDatabase role. What types of actions can the user take with this role only?
+   - **Answer:** 
+     - Create users and roles
+     - Modify users and roles
+274)   How to revoke role from the user?
+   - **Answer:** 
+      ```
+      db.revokeRolesFromUser(
+         "financeUser",
+         [
+            { role: "read", db: "sample_training" }
+         ]
+      )
+      ```
+275)   How to get user information?
+   - **Answer:** `db.getUser("financeUser")`
+276)   You want to create users on a self-managed MongoDB deployment. What do you need to do before you can do so?
+   - **Answer:** 
+     -  Enable access control
+     -  Create a user administrator
+277)   How to configure audit in mongodb?
+   - **Answer:** 
+      ```
+      auditLog:
+         destination: file
+         format: JSON
+         path: /var/log/mongodb/auditLog.json
+      ```
+278)   Which destinations can audit events be printed to when using a self-managed MongoDB instance?
+   - **Answer:**  Console, syslog, BSON/JSON file
+279)   What are some limitations of encryption at rest?
+   - **Answer:** 
+     - Managing encryption keys can be a challenge.
+     - It does not protect against attacks on data in memory.
+     - It does not protect against insider threats.
+280)   Enumerate encryption mechanisms of mongodb
+   - **Answer:** 
+     - CLient-Side Field Encryption - additional layer of security on client level
+     - TLS
+     - Encryption at rest (only for Enterprise version) - Encryption at rest protects data in storage by encrypting the data files on the database server, along with any backup copies of the data
+281)   How does MongoDB support encryption of data in transit?
+   - **Answer:** 
+     - Client-Side Field Level Encryption (CSFLE) 
+     - TLS
+282)   How does MongoDB support in-use encryption?
+   - **Answer:** 
+     - Automatic encryption (CSFLE) Enterprise version
+     - Client-Side Field Level Encryption (CSFLE) 
+283)   How does MongoDB provide encryption at rest? 
+   - **Answer:** 
+     - Client-Side Field Level Encryption (CSFLE)
+     - Encrypted Storage Engine
+284)   What is the best practice for backing up data in MongoDB in a production environment?
+   - **Answer:** Use a replica set and take a backup of a secondary node
+285)   What is the recommended method to store user credentials in a MongoDB deployment with multiple replica sets?
+   - **Answer:** By storing credentials in a hashed format in a dedicated authentication database
+286)   How to configure MongoDB to enforce internal SCRAM authentication?
+   - **Answer:** 
+      ```
+      security:
+         keyFile: /var/mongodb/pki/node1/keyfile
+      ```
+287)   In a MongoDB sharded cluster, how is the routing of client operations to the appropriate shard determined?
+   - **Answer:** By the `mongos` process 
+288)   What is the configuration that should choosen for production MongoDB cluster to ensure that systems are highly available?
+   - **Answer:** 
+     -  deploy config servers as a 3 member replica set
+     -  deploy each shard as a 3 member replica set
+     -  deploy one or more `mongos` routers
+289)   How many documents will be inserted by:
+         ```
+               db.companies.insertMany([
+                  {"_id": 1, "name": "Facebook"},
+                  {"_id": 2, "name": "Twitter"}, 
+                  {"_id": 2, "name": "Tesla"}
+               ])
+         ```
+   - **Answer:** 2
+290)   When performing a MongoDB database backup, what are the key considerations to ensure data integrity and consistency?
+   - **Answer:** 
+     - Take a snapshot of the database files using the operating system's file system-level backup mechanism
+     - Use the mongodump command to create a logical backup of the data
+     - Enable the "journal" option to ensure durability and crash recovery
+291)   What is the purpose of the `mongod` process in MongoDB?
+   - **Answer:** To manage the MongoDB database server
+292)   What is the built-in database called `config` in MongoDB for?
+   - **Answer:** The config database is used to store information about shards in shared MongoDB cluster.
+293)   The minimum recommended configuration for a replica set is?
+   - **Answer:** three member replica set - one primary and two secondary members
+294)   What role does the mongos process play in a MongoDB sharded cluster, and how does it ensure data consistency between shards?
+   - **Answer:** The `mongos` process is responsible for routing both read and write operations to the appropriate shards in the cluster, and it ensures data consistency between shards by using a distributed lock mechanism
+295)   What will happen when the network partition is resolved and node B becomes available again?
+   - **Answer:** The replica set will be reconfigured to elect a new primary node, based on the priorities and delays of the nodes. 
+296)   In a MongoDB sharded cluster, what is the correct process for adding a new shard to the cluster?
+   - **Answer:** Connect to the `mongos` router and run the sh.`addShard()` method to add the new shard to the cluster.
+297)   In MongoDB, which of the following data modeling techniques is the best for representing a many-to-many relationship between two entities?
+   - **Answer:** Creating a separate collection for the relationship between the two entities.
+298)   What is the main advantage of sharding in MongoDB?
+   - **Answer:** It allows horizontal scaling of data storage capacity.
+299)   You are managing a MongoDB deployment that experiences frequent write-heavy workloads. The application requires a high level of durability to ensure data integrity. Which of the following options would be the most suitable for achieving durability in this scenario?
+   - **Answer:** Enabling journaling with the write concern set to "majority" 
+300)   ________
    - **Answer:** AAAAAnswr
-270)   ________
+301)   ________
    - **Answer:** AAAAAnswr
-271)   ________
+302)   ________
    - **Answer:** AAAAAnswr
-272)   ________
+303)   ________
    - **Answer:** AAAAAnswr
-273)   ________
-   - **Answer:** AAAAAnswr
-274)   ________
-   - **Answer:** AAAAAnswr
-275)   ________
-   - **Answer:** AAAAAnswr
-276)   ________
-   - **Answer:** AAAAAnswr
-277)   ________
-   - **Answer:** AAAAAnswr
-278)   ________
-   - **Answer:** AAAAAnswr
-279)   ________
-   - **Answer:** AAAAAnswr
-280)   ________
-   - **Answer:** AAAAAnswr
-281)   ________
-   - **Answer:** AAAAAnswr
-282)   ________
-   - **Answer:** AAAAAnswr
-283)   ________
-   - **Answer:** AAAAAnswr
-284)   ________
-   - **Answer:** AAAAAnswr
-285)   ________
-   - **Answer:** AAAAAnswr
-286)   ________
-   - **Answer:** AAAAAnswr
-287)   ________
-   - **Answer:** AAAAAnswr
-288)   ________
-   - **Answer:** AAAAAnswr
-289)   ________
+304)   ________
    - **Answer:** AAAAAnswr
 
 ## Monitoring using Precona MongoDB Exporter, Prometheus and Grafana
@@ -2506,6 +2591,8 @@ Replacing replica set member, to not forget to run `rs.reconfig(config)`
 
 To show the status of the replica set run: `rs.status()`
 
+Configure TLS
+<img src="./forReadme/mongo14.png" />
 
 # References:
 - https://www.mongodb.com/docs/drivers/
