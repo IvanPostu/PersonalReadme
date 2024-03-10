@@ -1904,15 +1904,55 @@ bsondump \
    - **Answer:** It allows horizontal scaling of data storage capacity.
 299)   You are managing a MongoDB deployment that experiences frequent write-heavy workloads. The application requires a high level of durability to ensure data integrity. Which of the following options would be the most suitable for achieving durability in this scenario?
    - **Answer:** Enabling journaling with the write concern set to "majority" 
-300)   ________
+300)   An shard collection command ends with an error: `sh.shardCollection("test.shardedColl", {shardKey: 1})` MongoServerError: couldn't find valid index for shard key. What is the cause of this error?
+   - **Answer:** `The field shardKey is indexed with a multikey index.`
+301)   What command shows if a query of db.load.find({ rnd: 1 }) in the profiling collection was supported by an index?
+   - **Answer:** `db.system.profile.find({"command.filter": {rnd: 1}, planSummary: /IXSCAN/})`
+302)   Which two mongod command line options affects where data files are stored?
+   - **Answer:**  ``` --directoryperdb ``` and  ``` --dbpath ```
+303)   What command returns in-progress operations that have been running for more than 3 seconds?
+   - **Answer:** `db.currentOp( { "active" : true, "secs_running" : { "$gt" : 3 } } )`
+304)   What two formats is the audit log written in?
+   - **Answer:**  JSON and BSON
+305)   What flag does the administrator use with mongodump during the backup process to capture operations for point-in-time recovery in a MongoDB replica set?
+   - **Answer:** ` mongodump --oplog`
+306)   ________
    - **Answer:** AAAAAnswr
-301)   ________
+307)   ________
    - **Answer:** AAAAAnswr
-302)   ________
+308)   ________
    - **Answer:** AAAAAnswr
-303)   ________
+309)   ________
    - **Answer:** AAAAAnswr
-304)   ________
+310)   ________
+   - **Answer:** AAAAAnswr
+311)   ________
+   - **Answer:** AAAAAnswr
+312)   ________
+   - **Answer:** AAAAAnswr
+313)   ________
+   - **Answer:** AAAAAnswr
+314)   ________
+   - **Answer:** AAAAAnswr
+315)   ________
+   - **Answer:** AAAAAnswr
+316)   ________
+   - **Answer:** AAAAAnswr
+317)   ________
+   - **Answer:** AAAAAnswr
+318)   ________
+   - **Answer:** AAAAAnswr
+319)   ________
+   - **Answer:** AAAAAnswr
+320)   ________
+   - **Answer:** AAAAAnswr
+321)   ________
+   - **Answer:** AAAAAnswr
+322)   ________
+   - **Answer:** AAAAAnswr
+323)   ________
+   - **Answer:** AAAAAnswr
+324)   ________
    - **Answer:** AAAAAnswr
 
 ## Monitoring using Precona MongoDB Exporter, Prometheus and Grafana
