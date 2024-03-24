@@ -11,8 +11,12 @@
 ## Predefined shortcuts
 - Ctrl + Alt + [Left|Right] **To go forward or backward** \
   In XFCE should be removed shortcut from Window Manager Settings
-- AAA
 
+## Fira code font
+- `git clone https://github.com/tonsky/FiraCode.git`
+- `sudo cp ttf/*.ttf /usr/share/fonts/truetype/fira-code`
+- `sudo fc-cache -f -v`
+- ![Alt text](./forReadme/img17.png "Optional title")
 
 ## Configure shortcuts
 - **Configure undo/redo**
