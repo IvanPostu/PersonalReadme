@@ -8,6 +8,9 @@
 - `chmod +x ./eclipse`
 - Run using: `./eclipse`
 
+## Custom formatter "My"
+- ![Alt text](./forReadme/img18.png "Optional title")
+
 ## Predefined shortcuts
 - Ctrl + Alt + [Left|Right] **To go forward or backward** \
   In XFCE should be removed shortcut from Window Manager Settings
